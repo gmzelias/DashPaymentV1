@@ -1,0 +1,7 @@
+{
+    "name": "mini",
+    "version": "1.0.0",
+    "formM": "Form test for request and response",
+    "main": "app.js"
+  }
+  
