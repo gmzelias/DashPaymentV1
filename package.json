@@ -15,5 +15,13 @@
   "bugs": {
     "url": "https://github.com/gmzelias/DashPaymentV1/issues"
   },
-  "homepage": "https://github.com/gmzelias/DashPaymentV1#readme"
+  "homepage": "https://github.com/gmzelias/DashPaymentV1#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "moment": "^2.22.2",
+    "mysql": "^2.16.0",
+    "request": "^2.88.0",
+    "wallet-address-validator": "^0.2.0"
+  }
 }
