@@ -93,7 +93,7 @@ router.post('/submit', function (req, res, next) {
 
   function setValue(data) {
     data.SimpleAddress=data.RAddress;
-    data.RAddress = data.RAddress +'?amount='+data.Amount;
+    data.RAddress ="dash:"+data.RAddress+'?amount='+data.Amount;
     console.log(data);
     res.render('submit', {data});
     };
