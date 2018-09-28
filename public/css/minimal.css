@@ -370,6 +370,12 @@ ul.blocknav {
   margin-right: 1em;
 }
 
+body {
+  height: 100%;
+  width: 100%;
+  background-color: #333;
+}
+/* Timer */
 
 
-
+}

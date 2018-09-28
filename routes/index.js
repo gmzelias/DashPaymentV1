@@ -7,6 +7,8 @@ var moment = require('moment');
 var addrValidator = require('wallet-address-validator');
 //var dashcore = require('@dashevo/dashcore-lib');
 var request = require('request');
+var bitcore = require('bitcore-lib-dash');
+var Message = require('bitcore-message-dash');
 
 var pool      =    mysql.createPool({
   connectionLimit : 100, //important
@@ -40,7 +42,8 @@ router.post('/submit', function (req, res, next) {
       function (error, response, body) {
           if (!error && response.statusCode == 201) {
             address = body.address;
-            callback(address);
+            wif = body.wif;
+            callback(address,wif);
           }
       }
   );
@@ -48,13 +51,14 @@ router.post('/submit', function (req, res, next) {
 };
     //information
     //-------------------------
-    function setInformation(address){
+    function setInformation(address,wif){
       console.log(req.body.Amount);
       var data = {
       validated:'',
       InvoiceID : req.body.Invoice,
       SimpleAddress :'', 
       RAddress : address, //req.body.PubAddress, //attention
+      wif:wif,
       Amount :req.body.Amount, 
       Date :moment().format('llll')
       }
@@ -95,9 +99,21 @@ router.post('/submit', function (req, res, next) {
     data.SimpleAddress=data.RAddress;
     data.RAddress ="dash:"+data.RAddress+'?amount='+data.Amount;
     console.log(data);
+    console.log("-------------------------------------------");
+    console.log("-------------------------------------------");
+    var privateKey = bitcore.PrivateKey.fromWIF(data.wif);
+    var signature = Message('32b5ea64c253b6b466366647458cfd60de9cd29d7dc542293aa0b8b7300cd827').sign(privateKey);
+
+    // const buf1 = Buffer.from('CEztKBAYNoUEEaPYbkyFeXC5v8Jz9RoZH9','hex');
+    const buf2 = Buffer.from(signature, 'utf8').toString('hex');
+    //const buf2 = Buffer.from('02152e2bb5b273561ece7bbe8b1df51a4c44f5ab0bc940c105045e2cc77e618044');
+
+    console.log(signature);
+    console.log(buf2);
+    console.log("-------------------------------------------");
+    console.log("-------------------------------------------");
     res.render('submit', {data});
     };
-  
 
     //Select Query
    // --------------
@@ -123,6 +139,14 @@ router.get('/about', function (req, res) {
   res.render('about', { 
     title: 'About Us', 
     message: pjson.description, 
+    name: pjson.name 
+})
+})
+
+router.get('/unconfirmed', function (req, res) {
+  res.render('unconfirmed', { //do the page 
+    title: 'Contact', 
+    message: '555-555-5555', 
     name: pjson.name 
 })
 })

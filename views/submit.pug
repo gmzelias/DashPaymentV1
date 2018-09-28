@@ -11,6 +11,11 @@ block content
             span#HexAddr  #{data.SimpleAddress}  
         p This is the amount: #{data.Amount}
         #RAddress
+        .ldBar(style='width:40%;height:40%;margin:auto')
+            .love
+        script(src='js/simplebundle.js')
+        //script(src='js/time.js')
         script(type='text/javascript').
             new QRCode(document.getElementById("RAddress"), "#{data.RAddress}");
+            
         
