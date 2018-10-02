@@ -70318,6 +70318,7 @@ WError.prototype.cause = function we_cause(c)
 },{"assert-plus":236,"core-util-is":245,"extsprintf":251,"util":186}],354:[function(require,module,exports){
 var request = require('request');
 function checkTx(/*callback*/){
+    console.log('entra en checkTX');
   var address= $('#HexAddr').text();
   request.get(
       "https://api.blockcypher.com/v1/dash/main/txs",
@@ -70327,7 +70328,7 @@ function checkTx(/*callback*/){
             for(var i = 0; i < body.length;i++){               
                 var addressUN = body[i].addresses;              
                 for(var o = 0; o < addressUN.length;o++){
-                    if (addressUN[o].trim() == address.trim()){
+                    if (addressUN[o].trim() == address.trim()){                   
                         console.log("Payment received");
                         var hash = body[i].hash;
                         var data = {
@@ -70335,21 +70336,28 @@ function checkTx(/*callback*/){
                             address: address,
                             pAddress: $('#p_a').text()
                         };
+                        o = addressUN.length;
+                        i =  body.length;   
+                        mSecondsSuccess = 1;
                         $.ajax({
                             type: "POST",
                             url: "http://localhost:3000/contact",
                             data: data,
-                            success: function(a) {
-                                window.location.href="http://localhost:3000/contact";
+                            success: function(a) {                           
+                              console.log('Spanish');
+                              //window.location.href="http://localhost:3000/contact";
                             }
                         });
-                        //window.location.href="http://localhost:3000/Txs";
                     }
+                    else{
+                        console.log('retrying...');
+                    }
+
                 }
             }
           }
           else{
-            alert("Confirmation Error");
+            alert("Confirmation Error (API)");
           }
       });
 };
@@ -70364,25 +70372,21 @@ function checkTx(/*callback*/){
     "type":'stroke',
     "stroke":"data:ldbar/res,gradient(0,1,#045089,#008de4)"
    });
-var cu = 60000;
+var mSeconds = 60000;
+var mSecondsSuccess = mSeconds;
 function rex(){
-cu = cu-100;
-if (cu<1){
+mSeconds = mSeconds-100;
+mSecondsSuccess = mSecondsSuccess-100;
+/*if (mSeconds<1){
     window.location.href="http://localhost:3000/contact";
-}
+}*/
 var segs = (Math.round($('.ldBar-label').text()/1000));
 $('.love').text(segs + " Secs");
-bar2.set(cu);
-/*if (cu % 10000 == 0 ){
+bar2.set(mSeconds);
+if (mSecondsSuccess % 15000 == 0 ){
     checkTx();
-}*/
 }
-/*setInterval(function () {
-    rex();
-    checkTx();
-}, 1000);*/
+}
 setInterval(rex,100);
-//checkTx();
-//set some timefunction to check that
-//setInterval(checkTx,15000)
+
 },{"request":296}]},{},[354]);

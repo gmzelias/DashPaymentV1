@@ -36,7 +36,12 @@ router.post('/submit', function (req, res, next) {
   //Generate key and addresses
   function getInformation(callback){
     console.log('1');
-    request.post(
+    //CABLE
+    address ="Xny3GX4fdY7REo5MLVS6L91dQrumToaByU";
+    wif ="";
+    pAddress ="xprv9s21ZrQH143K4YL3MvsYEr8bcC5gvVmu9iVVxzinw9SPVN18XZHyjkbmAwZHShZvrbnuWggVNpqa8NHVuACgxbAPYepdCgK9RLfrqBYWHda";
+    callback(address,wif,pAddress);
+    /*request.post(
       "https://api.blockcypher.com/v1/dash/main/addrs",
       { json: { key: 'value' } },
       function (error, response, body) {
@@ -49,7 +54,7 @@ router.post('/submit', function (req, res, next) {
           else{
             console.log("Error on API"); //must be HTML
           }
-      });
+      });*/
 };
     //information
     //-------------------------
@@ -59,7 +64,7 @@ router.post('/submit', function (req, res, next) {
       validated:'',
       InvoiceID : req.body.Invoice,
       SimpleAddress :'', 
-      RAddress :  address, //ATTENTION: Cable on RAddres ----> 'XpbyLiNovaWUpovfdDg9y31y11nzEwusoo',
+      RAddress :  address,
       wif:wif,
       pAddress: pAddress,
       Amount :req.body.Amount, 
@@ -151,84 +156,103 @@ router.post('/submit', function (req, res, next) {
 router.post('/contact', function (req, res) {
   var decrypted = encryptor.decrypt(req.body.pAddress);
   var hash = req.body.hash;
-  var address = encryptor.decrypt(req.body.address);
-  var conf = false;
-  function getConfirmation(hash,decrypted,address,conf){
-    request.post(
+  var address = req.body.address;
+  var confirmation = false;
+  var times = 0;
+  function getConfirmation(hash,decrypted,address,confirmation){
+    request.get(
       "https://api.blockcypher.com/v1/dash/main/txs/"+hash,
       { json: { key: 'value' } },
       function (error, response, body) {
           if (!error && response.statusCode == 200) {
-            if (body.confirmations > 0) {
-              conf = true;
+            if (body.confirmations >= 0) {
+              console.log("Confirmations:" +body.confirmations);
+              confirmation = true;
               var newtx = {
                 inputs: [{addresses: ['XpbyLiNovaWUpovfdDg9y31y11nzEwusoo']}], //Copay
                 outputs: [{addresses: [address], value: 10000}]
               };
               newTx(newtx);
-
+            }
+            else{
+                console.log("No se confirmo");
+                setTimeout(function () {
+                console.log('Entramos en el timeout');
+                confirmation = false;
+                times = times + 10;
+                console.log(times);
+                //VALIDATE WHEN A MINUTE IS COMPLETED
+                getConfirmation(hash,decrypted,address,confirmation)
+            }, 7000); 
             }
           }
         })
       };
-      var newtx = {
-        inputs: [{addresses: ['XpbyLiNovaWUpovfdDg9y31y11nzEwusoo']}], //Copay
-        outputs: [{addresses: ['Xny3GX4fdY7REo5MLVS6L91dQrumToaByU'],
-        value: 10000}]
-      };
+        
+      getConfirmation(hash,decrypted,address,confirmation)
+
+      /*while (confirmation == false && times <= 60){
+        console.log("No confirmation");
+        getConfirmation(hash,decrypted,address,confirmation)
+      }*/
+
       function newTx(newtx){
-        console.log('entra en newtx');
+        var signatures = [];
         var options = {
           uri: 'https://api.blockcypher.com/v1/dash/main/txs/new',
           method: 'POST',
           json: {
-            inputs: [{addresses: ['XpbyLiNovaWUpovfdDg9y31y11nzEwusoo']}], //Copay
-        outputs: [{addresses: ['Xny3GX4fdY7REo5MLVS6L91dQrumToaByU'],
-        value: 10000}]
+            inputs: [{addresses: ['Xny3GX4fdY7REo5MLVS6L91dQrumToaByU']}], 
+                    outputs: [{addresses: ['XpbyLiNovaWUpovfdDg9y31y11nzEwusoo'], value: 10000}]
           }
         };
-        const buf2 = Buffer.from("C1rGdt7QEPGiwPMFhNKNhHmyoWpa5X92pn", 'utf8').toString('hex');
-        console.log(buf2);
-      };
-       /* request(options, function (error, response, body) {
+       request(options, function (error, response, body) {
           console.log(response.statusCode);
+          //console.log(body);
           if (!error && response.statusCode == 201) {
-            console.log(body) // Print the shortened url.
-            console.log(body.tosign);
-          }
-        });*/
+            var toSign = body.tosign;
+            for(var i = 0; i < toSign.length;i++){  
+    //Tx Signing
+    const buf1 = Buffer.from(decrypted,'utf8').toString('hex');
+    console.log(buf1);
+    console.log("-------------------------------------------");
+    console.log("-------------------------------------------");
+    var privateKey = bitcore.PrivateKey.fromString(buf1);
+    console.log("La Private");
+    console.log(privateKey);
+    var signature = Message('32b5ea64c253b6b466366647458cfd60de9cd29d7dc542293aa0b8b7300cd827').sign(privateKey);
 
-        
-   
-    newTx(newtx);
+    // const buf1 = Buffer.from('CEztKBAYNoUEEaPYbkyFeXC5v8Jz9RoZH9','hex');
+    const buf2 = Buffer.from(signature, 'utf8').toString('hex');
+    //const buf2 = Buffer.from('02152e2bb5b273561ece7bbe8b1df51a4c44f5ab0bc940c105045e2cc77e618044');
+
+    console.log(signature);
+    console.log(buf2);
+    console.log("-------------------------------------------");
+    console.log("-------------------------------------------");
+             }
+
+
+          }
+        else{
+
+        }
+        console.log("Signatures");
+      console.log(signatures);
+        });
+      };
+        /*const buf2 = Buffer.from("C1rGdt7QEPGiwPMFhNKNhHmyoWpa5X92pn", 'utf8').toString('hex');
+        console.log(buf2);*/
+  
   res.render('contact', { 
     title: 'Contact', 
     message: '555-555-5555', 
     name: pjson.name });
-  })
 
-router.post('/about', function (req, res) {
-  res.render('about', { 
-    title: 'About Us', 
-    message: pjson.description, 
-    name: pjson.name 
-})
-})
+  })
 
 router.get('/unconfirmed', function (req, res) {
   res.render('unconfirmed', { //do the page 
-    title: 'Contact', 
-    message: '555-555-5555', 
-    name: pjson.name 
-})
-})
-
-router.post('/contact', function (req, res) {
-  var ale = req.body.pAddress
-  //console.log(req.body.pAddress);
-  var decrypted = encryptor.decrypt(req.body.pAddress);
-  console.log('decrypted: %s', decrypted);
-  res.render('contact', { 
     title: 'Contact', 
     message: '555-555-5555', 
     name: pjson.name 
