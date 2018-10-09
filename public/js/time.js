@@ -6,6 +6,7 @@ function checkTx(/*callback*/){
       "https://api.blockcypher.com/v1/dash/main/txs",
       { json: { key: 'value' } },
       function (error, response, body) {
+          //console.log(body);
           if (!error && response.statusCode == 200) {               
             for(var i = 0; i < body.length;i++){               
                 var addressUN = body[i].addresses;              
@@ -16,7 +17,9 @@ function checkTx(/*callback*/){
                         var data = {
                             hash: hash,
                             address: address,
-                            pAddress: $('#p_a').text()
+                            prAddress: $('#pr_a').text(),
+                            puAddress: $('#pu_a').text(),
+                            Address: $('#add_rr').text()
                         };
                         o = addressUN.length;
                         i =  body.length;   
@@ -26,7 +29,7 @@ function checkTx(/*callback*/){
                             url: "http://localhost:3000/contact",
                             data: data,
                             success: function(a) {                           
-                              console.log('Spanish');
+                              console.log('Success AJAX');
                               //window.location.href="http://localhost:3000/contact";
                             }
                         });

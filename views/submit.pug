@@ -5,7 +5,9 @@ block content
     if language == 'false' 
         p There was an error with the data, please try again.
     else
-        #p_a(hidden='') #{data.pAddress}
+        #pr_a(hidden='') #{data.privateAddress}
+        #pu_a(hidden='') #{data.publicAddress}
+        #add_rr(hidden='') #{data.Address}
         p This is an invoice number: #{data.InvoiceID}  
         div(style='display: -webkit-inline-box;')
             p This is the address that is about to be acredited:&nbsp 
