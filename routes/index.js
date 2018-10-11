@@ -177,9 +177,33 @@ router.post('/submit', function (req, res, next) {
 })
 
 router.post('/contact', function (req, res) {
-  var privdecrypted =  '55cde2a908502ecae4c78c1b3e64ee665e4f53466eceb14f7f3111d84e6177f6'; //encryptor.decrypt(req.body.prAddress);
-  var pubdecrypted = '030520050fa084018e5f17582530e77311232c81c7ad751d4900aaebec6d145b97';//'02131120b332f83deeb23a8fff06bd71a03485a270a1ee1412eb3eba97a5c008cb'; //encryptor.decrypt(req.body.puAddress);
-  var adrdecrypted = 'XevvnFCsUJY3HPHXX9ENrTfSLnsQWm9Nct';//encryptor.decrypt(req.body.Address); //'XfbYp3Tj4sD8N9Fgqw11AZsAwNhjK7RstW'; //encryptor.decrypt(req.body.Address);
+  //Callback of creating log
+  function logResponse(res){
+    if(res==true){
+      console.log("Log created successfully.");
+    }else{
+      console.log("Error creating  log.");
+    }
+  };
+     //Creates logs.
+  function runLog(data,callback) {
+      pool.query('INSERT INTO txlog SET ?', data, function (error, results, fields) {
+        if (!error){
+        console.log('Query executed.');
+        data.validated = true;
+        }
+        else{
+        console.log(error);
+        console.log('Error while performing Query.');
+        data.validated = false;
+        }
+      callback(data);
+    })
+  }
+  
+  var privdecrypted = 'dad92991c6a03f2c199da6101eaa9cfcd883ad80fc4dca71e834811428e179f9';// '596d9f706197a6cc11218376f5318a67d367f237ad7df0041eb634077988a316'; //encryptor.decrypt(req.body.prAddress);
+  var pubdecrypted = '03fd64ec65e8f4d0c859ffd9b30ca76298b2da2ef8b3bbfadf381d7411f61ac3c8';//'025b717c80d89188ecf8954c553e3391ca06e42963ca4be62ae3e6dff6267d605d';//encryptor.decrypt(req.body.puAddress);
+  var adrdecrypted = 'XqaWuXd8vgpNXZEjgXoihNC8Tr31ocTgUW';//encryptor.decrypt(req.body.Address);
   console.log('Address:'+adrdecrypted);
   console.log('Private:'+privdecrypted);
   console.log('Public:'+pubdecrypted);
@@ -201,7 +225,7 @@ router.post('/contact', function (req, res) {
               console.log(body);
               console.log('End of 1st transaction -------------------------------------------');
               
-              var total = (110000) - 13000 //+ body.fees; 
+              var total = 700 //body.total;//+ body.fees; 
 
               function BigTx(Big){
                 testB = Big.Errors;
@@ -209,7 +233,20 @@ router.post('/contact', function (req, res) {
               function bigTxCompleted(BigSigned){
                 SignedBig = BigSigned.Errors;
                 if (SignedBig==false){ 
-                  console.log('Big Completa falta generar y firmar Small');
+                  console.log('Big Completa, falta generar y firmar Small');
+                    //Generate Log
+                    var LogData = {
+                      InputAddress :BigSigned.Input,
+                      OutputAddress:BigSigned.Output, 
+                      Value:BigSigned.Value,
+                      Fee:BigSigned.Fee,
+                      Size:BigSigned.Size,
+                      Hash:BigSigned.Hash,   
+                      Date:BigSigned.ActualTime,
+                      Preference:BigSigned.Preference,
+                    }
+                  runLog(LogData,logResponse);
+
                   function smallTx(SmallTx){
                     SmallSigned = SmallTx.Errors;
                     if (SmallSigned==false){ 
@@ -219,32 +256,34 @@ router.post('/contact', function (req, res) {
                           console.log('Small completed...');
                         }
                         else{
-                          console.log('Error signing Small');
+                          console.log('Error signing small');
                         }
                       }
-                    SendTx(SmallTx.tx,SmallTx.toSign,SmallTx.signatures,SmallTx.pubkeys,smallTxCompleted);
+                   // SendTx(SmallTx.tx,SmallTx.toSign,SmallTx.signatures,SmallTx.pubkeys,smallTxCompleted);
                     console.log('Big completed...');
                     }
                     else{
-                    console.log('Error signing Big');
+                    console.log('Error creating small');
                     }
                   }       
                   //Generar Small
-                  newTx(adrdecrypted,privdecrypted,pubdecrypted,total,'XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q',0.10,smallTx); //Xw9tZZGrh3RVb5e68jut1EFMyUSZMpBeqs Etherum
+                 // newTx(adrdecrypted,privdecrypted,pubdecrypted,total,'XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q',0.10,smallTx); //Xw9tZZGrh3RVb5e68jut1EFMyUSZMpBeqs Etherum
                     }
                 else{
-                  console.log('Error creating small transaction');
+                  console.log('Error signing big');
                     }
                 }
                 //Firmar Big
-                SendTx(Big.tx,Big.toSign,Big.signatures,Big.pubkeys,bigTxCompleted);
+               SendTx(Big.tx,Big.toSign,Big.signatures,Big.pubkeys,bigTxCompleted);
                 }
                 else{
               console.log('Error creating big transaction');
                 }
               }
               //Generar Big
-              newTx(adrdecrypted,privdecrypted,pubdecrypted,total,'XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q',0.90,BigTx); //XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q Dash Official Android
+              setTimeout(function () {
+                newTx(adrdecrypted,privdecrypted,pubdecrypted,total,'XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q',1,BigTx); //XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q Dash Official Android
+              }, 5000); 
 
                 /*function SmallTx(Small){
                   console.log('entro en smalltx');
@@ -308,13 +347,14 @@ router.post('/contact', function (req, res) {
         var output = output;
         console.log('Grand Total: '+ total);
         var value = Math.round(total * percent);
-        console.log('Value: '+value );
+        console.log('****************Value**********: '+ value );
         var options = {
           uri: 'https://api.blockcypher.com/v1/dash/main/txs/new',
           method: 'POST',
           json: {
+            confirmations:0,
             //preference:'low',
-            fees : 6500,
+            fees : 300,
             inputs: [{addresses: [input]}], 
             outputs: [{addresses: [output], value: value}],           
           }
@@ -331,8 +371,8 @@ router.post('/contact', function (req, res) {
                 //Tx Signing         
             console.log('Signing process...');
               var stringShell = 'signer'+' '+toSign[i]+' '+ privdecrypted;  //'6b558e5e6546d253b6bb1ad85a4dcaaac9fb42a8d68a661122854a3926ebb896'<--private from the input
-              var reina = shell.exec(stringShell);             
-              var signed = reina.stdout;
+              var shellexec = shell.exec(stringShell);             
+              var signed = shellexec.stdout;
               signed = signed.replace(/\n$/, '');
               signed = signed.trim();
               signatures.push(signed);
@@ -358,8 +398,7 @@ router.post('/contact', function (req, res) {
           }
           callback(ResultObject);  
              }   
-        });
-      
+        }); 
       };
 
       function SendTx(tx,toSign,signatures,pubkeys,callback){
@@ -390,7 +429,15 @@ router.post('/contact', function (req, res) {
           if (!error && response.statusCode == 201) {
             ResultObject = {
               Errors : false,
-            }
+              Input:body.tx.addresses[0],
+              Output:body.tx.addresses[1], 
+              Value:body.tx.value, 
+              Fee:body.tx.fee,
+              Size:body.tx.size,
+              Hash : body.tx.hash,      
+              ActualTime : moment().format('llll'),
+              Preference:body.tx.preference
+              }
             callback(ResultObject);
           }
             else{
