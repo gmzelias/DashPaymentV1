@@ -31,12 +31,45 @@ var pool      =    mysql.createPool({
 
 //Front Page
 router.get('/', function (req, res) {
-  res.render('index', { 
-    title: 'Home', 
+  function getRate(callback){
+    RateInfo = {
+      error:0,
+      rate:0
+    }
+  var options = {
+    uri: 'http://dash.casa/api/?cur=VES',
+    method: 'GET'
+  };
+  request(options, function (error, response, body) {   
+    if (!error && response.statusCode == 200) {
+      var JsonBody = JSON.parse(body);
+      RateInfo.error=JsonBody.errcode;
+      RateInfo.rate=JsonBody.dashrate;
+    }
+   else{
+     RateInfo.error=0;
+    }
+    callback(RateInfo);
+  });
+};
+function Render(RateInfo){
+  DataToRender = {
+    title: 'Dash Payment System', 
     message: pjson.formM, 
-    name: pjson.name 
-})
-})
+    name: pjson.name,
+    rate : 'NaN'
+    }
+  if (RateInfo.error==0){
+    DataToRender.rate = RateInfo.rate
+  }
+  DataToRender.rate = Math.round(DataToRender.rate * 100) / 100
+  console.log(DataToRender);
+  res.render('index',DataToRender);
+};
+getRate(Render);
+});
+
+
 //Submit Button
 router.post('/submit', function (req, res, next) {
             /*"private": "6b558e5e6546d253b6bb1ad85a4dcaaac9fb42a8d68a661122854a3926ebb896",
@@ -75,6 +108,7 @@ router.post('/submit', function (req, res, next) {
 };
       // -------Validate de address
     function setInformation(Address){
+      console.log(req.body);
      console.log('2');
       var data = {
       validated:'',
@@ -83,9 +117,11 @@ router.post('/submit', function (req, res, next) {
       Address :  Address.address,
       Wif:Address.wif,
       Public: Address.public,
-      Amount :req.body.Amount, 
+      Amount :req.body.DashAmount, 
+      AmountBsS : req.body.Amount,
       Date :moment().format('llll')
       }
+     
       var addrCheck = addrValidator.validate(data.Address, 'DASH');
       console.log('2.5');
       console.log(addrCheck);
@@ -174,12 +210,15 @@ router.post('/submit', function (req, res, next) {
       Ammount: req.body.Ammount
     });
     res.end(json);*/
-})
+});
+
+
+
 
 router.post('/contact', function (req, res) {
   //Callback of creating log
   function logResponse(res){
-    if(res==true){
+    if(res.validated==true){
       console.log("Log created successfully.");
     }else{
       console.log("Error creating  log.");
@@ -198,12 +237,11 @@ router.post('/contact', function (req, res) {
         data.validated = false;
         }
       callback(data);
-    })
-  }
-  
-  var privdecrypted = 'dad92991c6a03f2c199da6101eaa9cfcd883ad80fc4dca71e834811428e179f9';// '596d9f706197a6cc11218376f5318a67d367f237ad7df0041eb634077988a316'; //encryptor.decrypt(req.body.prAddress);
-  var pubdecrypted = '03fd64ec65e8f4d0c859ffd9b30ca76298b2da2ef8b3bbfadf381d7411f61ac3c8';//'025b717c80d89188ecf8954c553e3391ca06e42963ca4be62ae3e6dff6267d605d';//encryptor.decrypt(req.body.puAddress);
-  var adrdecrypted = 'XqaWuXd8vgpNXZEjgXoihNC8Tr31ocTgUW';//encryptor.decrypt(req.body.Address);
+    });
+  };
+  var privdecrypted = encryptor.decrypt(req.body.prAddress);//'43592e6549a22d033ba6e4068308a07236da5feb51d9ec1978a986ca17efc2c1';//encryptor.decrypt(req.body.prAddress);
+  var pubdecrypted = encryptor.decrypt(req.body.puAddress);//'0361b6d42b0109751ae19898855b25c07e0f2b9c3f22d5257b58bfc1642d0ea57f';//encryptor.decrypt(req.body.puAddress);
+  var adrdecrypted = encryptor.decrypt(req.body.Address);//'XrNUrhPrUVnL4CXJ3urXitJhwsUizhxqie';//encryptor.decrypt(req.body.Address);
   console.log('Address:'+adrdecrypted);
   console.log('Private:'+privdecrypted);
   console.log('Public:'+pubdecrypted);
@@ -223,10 +261,8 @@ router.post('/contact', function (req, res) {
               confirmation = true;
               console.log('1st transaction -------------------------------------------');
               console.log(body);
-              console.log('End of 1st transaction -------------------------------------------');
-              
-              var total = 700 //body.total;//+ body.fees; 
-
+              console.log('End of 1st transaction -------------------------------------------');        
+              var total = 600;//+ body.fees; // Attention with the total!!!!!!!!!
               function BigTx(Big){
                 testB = Big.Errors;
                 if (testB==false){          
@@ -238,12 +274,14 @@ router.post('/contact', function (req, res) {
                     var LogData = {
                       InputAddress :BigSigned.Input,
                       OutputAddress:BigSigned.Output, 
-                      Value:BigSigned.Value,
-                      Fee:BigSigned.Fee,
+                      ForcedValue:BigSigned.ForcedValue,
+                      ValueInSkeleton:BigSigned.Value,
+                      ForcedFee:BigSigned.ForcedFee,
+                      ActualFee:BigSigned.ActualFee,
                       Size:BigSigned.Size,
+                      Preference:BigSigned.Preference,
                       Hash:BigSigned.Hash,   
                       Date:BigSigned.ActualTime,
-                      Preference:BigSigned.Preference,
                     }
                   runLog(LogData,logResponse);
 
@@ -274,7 +312,7 @@ router.post('/contact', function (req, res) {
                     }
                 }
                 //Firmar Big
-               SendTx(Big.tx,Big.toSign,Big.signatures,Big.pubkeys,bigTxCompleted);
+               SendTx(Big.tx,Big.toSign,Big.signatures,Big.pubkeys,Big.ForcedValue,Big.ForcedFee,bigTxCompleted);
                 }
                 else{
               console.log('Error creating big transaction');
@@ -283,7 +321,7 @@ router.post('/contact', function (req, res) {
               //Generar Big
               setTimeout(function () {
                 newTx(adrdecrypted,privdecrypted,pubdecrypted,total,'XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q',1,BigTx); //XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q Dash Official Android
-              }, 5000); 
+              }, 1000); //Timeout!
 
                 /*function SmallTx(Small){
                   console.log('entro en smalltx');
@@ -345,6 +383,7 @@ router.post('/contact', function (req, res) {
         //console.log(decrypted);
         var input = adrdecrypted; //'XuDy7dvHrBfsRbj6w5xm3UQjtAQKGhzFW7'; <-- where money comes from, generated by blockcypher
         var output = output;
+        var fee = 500; // <-- Forced Fee!
         console.log('Grand Total: '+ total);
         var value = Math.round(total * percent);
         console.log('****************Value**********: '+ value );
@@ -354,7 +393,7 @@ router.post('/contact', function (req, res) {
           json: {
             confirmations:0,
             //preference:'low',
-            fees : 300,
+            fees : fee,
             inputs: [{addresses: [input]}], 
             outputs: [{addresses: [output], value: value}],           
           }
@@ -383,7 +422,9 @@ router.post('/contact', function (req, res) {
               tx:tx,
               toSign:toSign,
               signatures:signatures,
-              pubkeys:pubkeys
+              pubkeys:pubkeys,
+              ForcedValue: value,
+              ForcedFee: fee
             }
             callback(ResultObject);         
           }
@@ -394,14 +435,16 @@ router.post('/contact', function (req, res) {
             tx:tx,
             toSign:toSign,
             signatures:signatures,
-            pubkeys:pubkeys
+            pubkeys:pubkeys,
+            ForcedValue: value,
+            ForcedFee: fee
           }
           callback(ResultObject);  
              }   
         }); 
       };
 
-      function SendTx(tx,toSign,signatures,pubkeys,callback){
+      function SendTx(tx,toSign,signatures,pubkeys,forcedvalue,forcedfee,callback){
         /*console.log('tosign');
         console.log(toSign);
         console.log('signatures');
@@ -431,13 +474,15 @@ router.post('/contact', function (req, res) {
               Errors : false,
               Input:body.tx.addresses[0],
               Output:body.tx.addresses[1], 
-              Value:body.tx.value, 
-              Fee:body.tx.fee,
+              ForcedValue:forcedvalue,
+              Value:body.tx.total, 
+              ForcedFee:forcedfee,
+              ActualFee:body.tx.fees,
               Size:body.tx.size,
               Hash : body.tx.hash,      
               ActualTime : moment().format('llll'),
               Preference:body.tx.preference
-              }
+              };
             callback(ResultObject);
           }
             else{
