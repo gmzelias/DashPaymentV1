@@ -70329,7 +70329,11 @@ function checkTx(/*callback*/){
             for(var i = 0; i < body.length;i++){               
                 var addressUN = body[i].addresses;              
                 for(var o = 0; o < addressUN.length;o++){
-                    if (addressUN[o].trim() == address.trim()){                   
+                    if (addressUN[o].trim() == address.trim()){    
+                        //here the blur               
+                        $('#timerqr').addClass("blurmed");
+                        $('#maindv').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dashnew.svg" class="ld ld-coin-h" /></div>')
+                        clearInterval(refreshIntervalId);
                         console.log("Payment received");
                         var hash = body[i].hash;
                         var data = {
@@ -70349,7 +70353,10 @@ function checkTx(/*callback*/){
                             success: function(a) {                           
                               console.log('Success AJAX');
                               $('#middle').append(a);
-                              console.log(a);
+                              $('#DashLoader').removeClass("ld");
+                              $('#maindv').prepend('<div class = "topdivchecked"><img id="DashCompleted" style="width:100px;height:100px;animation-duration:12.0s" src="img/checkdash.svg" class="ld ld-jump" /></div>')
+                              //console.log(a);
+                              //$("#timerqr").removeClass("blurmed");
                               //window.location.href="http://localhost:3000/contact";
                             },
                             error: function (e) {
@@ -70392,10 +70399,11 @@ mSecondsSuccess = mSecondsSuccess-100;
 var segs = (Math.round($('.ldBar-label').text()/1000));
 $('.love').text(segs + " Secs");
 bar2.set(mSeconds);
-if (mSecondsSuccess % 15000 == 0 ){
+if (mSecondsSuccess % 10000 == 0 ){
     checkTx();
 }
 }
-setInterval(rex,100);
+var refreshIntervalId = setInterval(rex,100);
+refreshIntervalId;
 
 },{"request":296}]},{},[354]);

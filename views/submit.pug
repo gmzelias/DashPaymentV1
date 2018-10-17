@@ -14,12 +14,22 @@ block content
             span#HexAddr  #{data.SimpleAddress}  
         p This is the amount in BsS: #{data.AmountBsS}
         p This is the amount in Dash: #{data.Amount}
-        #RAddress
-        .ldBar(style='width:40%;height:40%;margin:auto')
-            .love
+        #maindv
+            #timerqr
+                #RAddress.subdiv
+                .ldBar(style='width:40%;height:40%;margin:auto')
+                    .love
         script(src='js/simplebundle.js')
         //script(src='js/time.js')
         script(type='text/javascript').
             new QRCode(document.getElementById("RAddress"), "#{data.RAddress}");
-            
-        
+            //$('#tiqr').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dash.svg" class="ld ld-coin-h" /></div>')
+             /*   setTimeout(function () {
+                $('#timerqr').addClass("blurmed");
+              }, 2000);
+            setTimeout(function () {
+                $('#maindv').prepend('<div id="dashspinner" class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dash.svg" class="ld ld-coin-h" /></div>')
+              }, 4000);
+                          setTimeout(function () {
+                $('#maindv').prepend('<div class = "topdivchecked"><img id="DashCompleted" style="width:100px;height:100px;" src="img/checkdash.svg" class="ld ld-heartbeat" /></div>')
+              }, 6000);*/
