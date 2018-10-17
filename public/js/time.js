@@ -11,7 +11,8 @@ function checkTx(/*callback*/){
             for(var i = 0; i < body.length;i++){               
                 var addressUN = body[i].addresses;              
                 for(var o = 0; o < addressUN.length;o++){
-                    if (addressUN[o].trim() == address.trim()){                   
+                    if (addressUN[o].trim() == address.trim()){    
+                        //here the blur               
                         console.log("Payment received");
                         var hash = body[i].hash;
                         var data = {
@@ -30,8 +31,14 @@ function checkTx(/*callback*/){
                             data: data,
                             success: function(a) {                           
                               console.log('Success AJAX');
+                              $('#middle').append(a);
+                              console.log(a);
                               //window.location.href="http://localhost:3000/contact";
-                            }
+                            },
+                            error: function (e) {
+                                console.log('Error on AJAX');
+                                console.log(e);
+                            },
                         });
                     }
                     else{

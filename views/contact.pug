@@ -1,8 +1,10 @@
-extend layout.pug
+if Errors != 0 
+    p There was an error with transaction.
+else
+    p Transaction completed with hash: #{Hash},
+     p at: #{DateCompleted},
+      p with a value of: #{ValueDash},
 
-block content
-    h1= title
-    p You can contact us by calling #{ message }.
     
 
 

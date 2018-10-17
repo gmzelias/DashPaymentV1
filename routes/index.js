@@ -72,6 +72,8 @@ getRate(Render);
 
 //Submit Button
 router.post('/submit', function (req, res, next) {
+  /*var tools = require('../public/js/quey');
+  tools.foo; */
             /*"private": "6b558e5e6546d253b6bb1ad85a4dcaaac9fb42a8d68a661122854a3926ebb896",
   
             "public": "02e91a29b20b2f7458d74f820c4e55137a1b65ed2763e43aadca50a5daa999ff0a",
@@ -213,8 +215,6 @@ router.post('/submit', function (req, res, next) {
 });
 
 
-
-
 router.post('/contact', function (req, res) {
   //Callback of creating log
   function logResponse(res){
@@ -224,7 +224,7 @@ router.post('/contact', function (req, res) {
       console.log("Error creating  log.");
     }
   };
-     //Creates logs.
+  //Creates logs.
   function runLog(data,callback) {
       pool.query('INSERT INTO txlog SET ?', data, function (error, results, fields) {
         if (!error){
@@ -246,17 +246,21 @@ router.post('/contact', function (req, res) {
   console.log('Private:'+privdecrypted);
   console.log('Public:'+pubdecrypted);
   var hash = req.body.hash;
+  //CHECK CHECK CHECK CHECK
   var address = req.body.address;
+  //CHECK CHECK CHECK CHECK
   var confirmation = false;
   var times = 0;
   //Checks if the first tx has been done (QR SCANNING).
   function getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation){
-    var total = 2000;//+ body.fees; // Attention with the total!!!!!!!!!
+    var total;//+ body.fees; // Attention with the total!!!!!!!!!
     request.get(
       "https://api.blockcypher.com/v1/dash/main/txs/"+hash,
       { json: { key: 'value' } },
       function (error, response, body) {
           if (!error && response.statusCode == 200) {
+            //No confirmations needed
+
             if (body.confirmations >= 0) {
               //console.log("Confirmations:" +body.confirmations);
               confirmation = true;
@@ -267,18 +271,17 @@ router.post('/contact', function (req, res) {
                   total = body.outputs[i].value;
                 }
               }
-              console.log('Total without fee');   
+              console.log('Total with fee');   
               console.log(total);
               console.log('End of 1st transaction -------------------------------------------');    
 
-              
               function BigTx(Big){
                 testB = Big.Errors;
                 if (testB==false){          
               function bigTxCompleted(BigSigned){
                 SignedBig = BigSigned.Errors;
                 if (SignedBig==false){ 
-                  console.log('Big Completa, falta generar y firmar Small');
+                  console.log('Tx completed.');
                     //Generate Log
                     var LogData = {
                       InputAddress :BigSigned.Input,
@@ -292,78 +295,29 @@ router.post('/contact', function (req, res) {
                       Hash:BigSigned.Hash,   
                       Date:BigSigned.ActualTime,
                     }
-                  runLog(LogData,logResponse);
-
-                  function smallTx(SmallTx){
-                    SmallSigned = SmallTx.Errors;
-                    if (SmallSigned==false){ 
-                      function smallTxCompleted(SmallTxSigned){
-                        SmallSign = SmallTxSigned.Errors;
-                        if (SmallSign==false){ 
-                          console.log('Small completed...');
-                        }
-                        else{
-                          console.log('Error signing small');
-                        }
-                      }
-                   // SendTx(SmallTx.tx,SmallTx.toSign,SmallTx.signatures,SmallTx.pubkeys,smallTxCompleted);
-                    console.log('Big completed...');
-                    }
-                    else{
-                    console.log('Error creating small');
-                    }
-                  }       
-                  //Generar Small
-                 // newTx(adrdecrypted,privdecrypted,pubdecrypted,total,'XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q',0.10,smallTx); //Xw9tZZGrh3RVb5e68jut1EFMyUSZMpBeqs Etherum
+                  runLog(LogData,logResponse);  
+                  res.render('contact',{
+                    Errors : 0,
+                    Hash:BigSigned.Hash,
+                    DateCompleted:BigSigned.ActualTime,
+                    ValueDash:BigSigned.Value,
+                  });
                     }
                 else{
-                  console.log('Error signing big');
+                  console.log('Error signing tx');
                     }
                 }
                 //Firmar Big
                SendTx(Big.tx,Big.toSign,Big.signatures,Big.pubkeys,Big.ForcedValue,Big.ForcedFee,bigTxCompleted);
                 }
                 else{
-              console.log('Error creating big transaction');
+              console.log('Error creating transaction');
                 }
               }
               //Generar Big
-              setTimeout(function () {
+              /*setTimeout(function () {*/
                 newTx(adrdecrypted,privdecrypted,pubdecrypted,total,'XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q',1,BigTx); //XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q Dash Official Android
-              }, 1000); //Timeout!
-
-                /*function SmallTx(Small){
-                  console.log('entro en smalltx');
-                  testS = Small.Errors;
-                  console.log(testB);
-                  console.log(testS);
-                  if (testB == false && testS==false){
-                    console.log('Starting confirmation process');
-                    SendTx(Big.tx,Big.toSign,Big.signatures,Big.pubkeys,txCompleted);
-                    function txCompleted(){
-                      console.log('Big completed...');
-                    SendTx(Small.tx,Small.toSign,Small.signatures,Small.pubkeys);
-                    }                
-                  }
-                  else{
-                    console.log('Error on Signing')
-                  }
-                };
-                setTimeout(function () {
-                  newTx(decrypted,total,'XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q',0.50,SmallTx); // Electrum Xw9tZZGrh3RVb5e68jut1EFMyUSZMpBeqs
-                }, 10000); 
-              };
-              newTx(decrypted,total,'XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q',0.90,BigTx);*/
-
-              //newTx(decrypted,total,'XiAb8znhJqfq4JEd7ty532cPkwsfaE9VkL',0.01,SmallTx);
-              //console.log(BigTx.Error);
-              //console.log(SmallTx.Errors);
-              //if (BigTx.Errors == false && SmallTx.Errors == false ){
-              //console.log('No errors');
-             // }
-              //else{
-             // console.log('Errors found');  
-              //}
+             /* }, 1000); //Timeout!*/
             }
             else{
                 console.log("No se confirmo");
@@ -375,21 +329,13 @@ router.post('/contact', function (req, res) {
                 body.confirmations = 3;
                 //VALIDATE WHEN A MINUTE IS COMPLETED
                 getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation)
-            }, 3000); 
+                }, 3000); 
             }
           }
         })
       };
-        
-      getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation)
-      /*while (confirmation == false && times <= 60){
-        console.log("No confirmation");
-        getConfirmation(hash,decrypted,address,confirmation)
-      }*/
-
       function newTx(adrdecrypted,privdecrypted,pubdecrypted,total,output,percent,callback){
         var ResultObject;
-        //console.log(decrypted);
         var input = adrdecrypted; //'XuDy7dvHrBfsRbj6w5xm3UQjtAQKGhzFW7'; <-- where money comes from, generated by blockcypher
         var output = output;
         var output2 = 'Xw9tZZGrh3RVb5e68jut1EFMyUSZMpBeqs';
@@ -398,9 +344,7 @@ router.post('/contact', function (req, res) {
         var total =  total - 500;
         var value = Math.round((total * percent));
         value = Math.floor((value / 2));
-
-
-        console.log('****************Value**********: '+ value );
+        console.log('****************Value*****************: '+ value );
         var options = {
           uri: 'https://api.blockcypher.com/v1/dash/main/txs/new',
           method: 'POST',
@@ -460,12 +404,6 @@ router.post('/contact', function (req, res) {
       };
 
       function SendTx(tx,toSign,signatures,pubkeys,forcedvalue,forcedfee,callback){
-        /*console.log('tosign');
-        console.log(toSign);
-        console.log('signatures');
-        console.log(signatures);
-        console.log('pubkeys');
-        console.log(pubkeys);*/
         var options = {
           uri: 'https://api.blockcypher.com/v1/dash/main/txs/send',
           method: 'POST',
@@ -507,7 +445,8 @@ router.post('/contact', function (req, res) {
               callback(ResultObject);
             }
         });
-      }
+      };
+      getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation);
   });
 
 router.get('/unconfirmed', function (req, res) {

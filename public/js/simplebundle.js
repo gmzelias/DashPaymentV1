@@ -70348,8 +70348,14 @@ function checkTx(/*callback*/){
                             data: data,
                             success: function(a) {                           
                               console.log('Success AJAX');
+                              $('#middle').append(a);
+                              console.log(a);
                               //window.location.href="http://localhost:3000/contact";
-                            }
+                            },
+                            error: function (e) {
+                                console.log('Error on AJAX');
+                                console.log(e);
+                            },
                         });
                     }
                     else{
