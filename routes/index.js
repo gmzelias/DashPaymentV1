@@ -155,6 +155,7 @@ router.post('/submit', function (req, res, next) {
         }
       callback(data);
     });*/
+    data.validated = true;
     callback(data);
   };
   //Sets the data in PUG.
@@ -239,6 +240,7 @@ router.post('/contact', function (req, res) {
         }
       callback(data);
     });*/
+    data.validated = true;
     callback(data);
   };
   var privdecrypted = encryptor.decrypt(req.body.prAddress);//'43592e6549a22d033ba6e4068308a07236da5feb51d9ec1978a986ca17efc2c1';//encryptor.decrypt(req.body.prAddress);
