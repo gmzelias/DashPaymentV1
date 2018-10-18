@@ -257,7 +257,7 @@ router.post('/contact', function (req, res) {
   var times = 0;
   //Checks if the first tx has been done (QR SCANNING).
   function getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation){
-    var total = 2000;//+ body.fees; // Attention with the total!!!!!!!!!
+    var total = 1000;//+ body.fees; // Attention with the total!!!!!!!!!
     request.get(
       "https://api.blockcypher.com/v1/dash/main/txs/"+hash,
       { json: { key: 'value' } },
