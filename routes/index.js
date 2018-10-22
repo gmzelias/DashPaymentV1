@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pjson = require('../test.json');
-const cars = require('../carsData.json');
+//const cars = require('../carsData.json');
 var mysql      = require('mysql');
 var moment = require('moment');
 var addrValidator = require('wallet-address-validator');
@@ -271,9 +271,8 @@ router.post('/contact', function (req, res) {
               console.log(body);
 
              for(var i = 0; i < body.outputs.length;i++){  
-                if(body.outputs[i].addresses == adrdecrypted){
-                  total = body.outputs[i].value;
-                }
+                if(body.outputs[i].addresses == adrdecrypted)
+                  total = body.outputs[i].value;    
               }
               
               console.log('End of 1st transaction -------------------------------------------');    
@@ -469,16 +468,15 @@ router.get('/unconfirmed', function (req, res) {
     message: '555-555-5555', 
     name: pjson.name 
 })
-})
+});
 
-router.get('/:id', function (req, res) {
+/*router.get('/:id', function (req, res) {
   var i = 0;
   switch(req.params.id) {
     case 'toyota': i = 0; break;
     case 'subaru': i = 1; break;
     case 'nissan': i = 2; 
 }
-  
   res.render('cars', { 
     currentBrand: req.params.id.charAt(0).toUpperCase() + req.params.id.substr(1),
     title: req.params.id,
@@ -487,6 +485,6 @@ router.get('/:id', function (req, res) {
     model2: cars[i].models[1],
     model3: cars[i].models[2]
     })
-})
+});*/
 
 module.exports = router;

@@ -70348,7 +70348,7 @@ function checkTx(/*callback*/){
                         mSecondsSuccess = 1;
                         $.ajax({
                             type: "POST",
-                            url: "http://localhost:3000/contact",
+                            url: "/contact",
                             data: data,
                             success: function(a) {                           
                               console.log('Success AJAX');
