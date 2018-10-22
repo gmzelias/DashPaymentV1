@@ -1,3 +1,5 @@
+require('./config/config');
+
 const express = require('express');
 const app = express();
 const routes = require ('./routes');
@@ -13,12 +15,12 @@ app.set('view engine', 'pug');
 app.use(express.static('public'))
 
 app.use(routes);
+const port = process.env.PORT;
 
-/*app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
-})*/
-
-app.listen(process.env.PORT || 3000, function () {
-  console.log('Example app listening on port 3000!');
+app.listen(port, function () {
+  console.log(`Example app listening on port ${port}!`);
 })
 
+/*app.listen(process.env.PORT || 3000, function () {
+  console.log('Example app listening on port 3000!');
+})*/

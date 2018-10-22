@@ -14,8 +14,7 @@ var request = require('request');
 //var dashcore = require('bitcore-lib-dash');
 //var Message = require('bitcore-message-dash');
 var encoder = require('int-encoder');//delete
-var key = 'realrealrealreal';// Don't do this though, your keys should most likely be stored in env variables
-                                                            // and accessed via process.env.MY_SECRET_KEY
+var key = process.env.JWT_SECRET;// 
 var encryptor = require('simple-encryptor')(key);
 const shell = require('shelljs');
 
@@ -309,6 +308,12 @@ router.post('/contact', function (req, res) {
                   });
                     }
                 else{
+                  res.render('contact',{
+                    Errors : 1,
+                    Hash:BigSigned.Hash,
+                    DateCompleted:BigSigned.ActualTime,
+                    ValueDash:BigSigned.Value,
+                  });
                   console.log('Error signing tx');
                     }
                 }
