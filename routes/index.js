@@ -275,6 +275,7 @@ router.post('/contact', function (req, res) {
                   total = body.outputs[i].value;
                 }
               }
+              
               console.log('End of 1st transaction -------------------------------------------');    
               function BigTx(Big){
                 testB = Big.Errors;
@@ -319,6 +320,12 @@ router.post('/contact', function (req, res) {
                 }
                 else{
               console.log('Error creating transaction');
+              res.render('contact',{
+                Errors : 1,
+                Hash:BigSigned.Hash,
+                DateCompleted:BigSigned.ActualTime,
+                ValueDash:BigSigned.Value,
+              });       
                 }
               }
               //Generar Big
