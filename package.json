@@ -18,12 +18,7 @@
   },
   "homepage": "https://github.com/gmzelias/DashPaymentV1#readme",
   "dependencies": {
-    "@dashevo/dashcore-lib": "^0.15.5",
-    "bigi": "^1.4.2",
-    "bitcore-message": "^1.0.4",
-    "bitcore-message-dash": "^1.0.9",
     "body-parser": "^1.18.3",
-    "ecdsa": "^0.7.0",
     "express": "^4.16.3",
     "int-encoder": "^1.1.1",
     "jsrsasign": "^8.0.12",
