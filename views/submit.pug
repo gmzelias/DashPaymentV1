@@ -1,35 +1,38 @@
 extend layout.pug
 
 block content
-    - var language = `${data.validated}`
-    if language == 'false' 
-        p There was an error with the data, please try again.
-    else
-        #pr_a(hidden='') #{data.privateAddress}
-        #pu_a(hidden='') #{data.publicAddress}
-        #add_rr(hidden='') #{data.Address}
-        p This is an invoice number: #{data.InvoiceID}  
-        div(style='display: -webkit-inline-box;')
-            p This is the address that is about to be acredited:&nbsp 
-            span#HexAddr  #{data.SimpleAddress}  
-        p This is the amount in BsS: #{data.AmountBsS}
-        p This is the amount in Dash: #{data.Amount}
-        #maindv
-            #timerqr
-                #RAddress.subdiv
-                .ldBar(style='width:40%;height:40%;margin:auto')
-                    .love
-        script(src='js/simplebundle.js')
-        //script(src='js/time.js')
-        script(type='text/javascript').
-            new QRCode(document.getElementById("RAddress"), "#{data.RAddress}");
-            //$('#tiqr').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dash.svg" class="ld ld-coin-h" /></div>')
-             /*   setTimeout(function () {
-                $('#timerqr').addClass("blurmed");
-              }, 2000);
-            setTimeout(function () {
-                $('#maindv').prepend('<div id="dashspinner" class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dash.svg" class="ld ld-coin-h" /></div>')
-              }, 4000);
-                          setTimeout(function () {
-                $('#maindv').prepend('<div class = "topdivchecked"><img id="DashCompleted" style="width:100px;height:100px;" src="img/checkdash.svg" class="ld ld-heartbeat" /></div>')
-              }, 6000);*/
+    #mainback.col-md-6.offset-md-3
+        #top
+            .imagelogo
+            .countdown
+        |
+        .row
+            #mainmiddle           
+                - var language = `${data.validated}`
+                if language == 'false' 
+                    p There was an error with the data, please try again.
+                else
+                    #pr_a(hidden='') #{data.privateAddress}
+                    #pu_a(hidden='') #{data.publicAddress}
+                    #add_rr(hidden='') #{data.Address}
+                    p.cost Precio: #{data.Amount} Dash
+                    p.costBs #{data.AmountBsS} BsS
+                    p.itemdesc #{data.InvoiceID}
+                    div(style='display: -webkit-inline-box;')
+                        #RAddress.subdiv  
+                        p This is the address that is about to be acredited:&nbsp 
+                        span#HexAddr  #{data.SimpleAddress}                     
+                    script(src='js/simplebundle.js')
+                    //script(src='js/time.js')
+                    script(type='text/javascript').
+                        new QRCode(document.getElementById("RAddress"), "#{data.RAddress}");
+                        //$('#tiqr').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dash.svg" class="ld ld-coin-h" /></div>')
+                        /*   setTimeout(function () {
+                            $('#timerqr').addClass("blurmed");
+                        }, 2000);
+                        setTimeout(function () {
+                            $('#maindv').prepend('<div id="dashspinner" class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dash.svg" class="ld ld-coin-h" /></div>')
+                        }, 4000);
+                                    setTimeout(function () {
+                            $('#maindv').prepend('<div class = "topdivchecked"><img id="DashCompleted" style="width:100px;height:100px;" src="img/checkdash.svg" class="ld ld-heartbeat" /></div>')
+                        }, 6000);*/

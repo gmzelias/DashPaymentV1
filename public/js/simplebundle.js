@@ -70318,7 +70318,7 @@ WError.prototype.cause = function we_cause(c)
 },{"assert-plus":236,"core-util-is":245,"extsprintf":251,"util":186}],354:[function(require,module,exports){
 var request = require('request');
 function checkTx(/*callback*/){
-    console.log('entra en checkTX');
+  console.log('entra en checkTX');
   var address= $('#HexAddr').text();
   request.get(
       "https://api.blockcypher.com/v1/dash/main/txs",
@@ -70377,7 +70377,15 @@ function checkTx(/*callback*/){
           }
       });
 };
-    var bar2 = new ldBar(".ldBar", {
+var clock = $('.countdown').FlipClock(4000,{
+    countdown:true,
+    clockFace: 'MinuteCounter',
+	onDestroy: function() {
+		// Do something
+	}
+    });
+    clock.setTime(900);
+   /* var bar2 = new ldBar(".ldBar", {
     "value":60000,
     "stroke": '#f00',
     "stroke-width": 10,
@@ -70387,23 +70395,22 @@ function checkTx(/*callback*/){
     "preset":'fan',
     "type":'stroke',
     "stroke":"data:ldbar/res,gradient(0,1,#045089,#008de4)"
-   });
-var mSeconds = 60000;
-var mSecondsSuccess = mSeconds;
+   });*/
+/*var mSeconds = 60000;
+var mSecondsSuccess = mSeconds;/*==*/
 function rex(){
-mSeconds = mSeconds-100;
+/*mSeconds = mSeconds-100;
 mSecondsSuccess = mSecondsSuccess-100;
-/*if (mSeconds<1){
-    window.location.href="http://localhost:3000/contact";
-}*/
 var segs = (Math.round($('.ldBar-label').text()/1000));
 $('.love').text(segs + " Secs");
 bar2.set(mSeconds);
 if (mSecondsSuccess % 10000 == 0 ){
-    checkTx();
+   // checkTx();
+}*/
+//checkTx();//ActivateTX
 }
-}
-var refreshIntervalId = setInterval(rex,100);
+
+var refreshIntervalId = setInterval(rex,10000);
 refreshIntervalId;
 
 },{"request":296}]},{},[354]);

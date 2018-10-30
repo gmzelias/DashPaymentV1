@@ -39,7 +39,7 @@ router.get('/', function (req, res) {
       rate:0
     }
   var options = {
-    uri: 'http://dash.casa/api/?cur=VES',
+    uri: 'https://dash.casa/api/?cur=VES',
     method: 'GET'
   };
   request(options, function (error, response, body) {   

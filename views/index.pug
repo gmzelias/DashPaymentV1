@@ -1,34 +1,35 @@
 extend layout.pug
 
 block content
-    - var rate = `${DataToRender.rate}`
-    if rate == 'NaN' 
-        p There was an error with the exchange rate, please try again.
-    else
-        h1= title
-        p 
-          | 1 Dash = 
-          span#ExRa #{DataToRender.rate}
-          |  BsS
-        form(action='/submit', method='POST')
-          .form-group
-            label.col-sm-3.col-form-label(for='Invoice') InvoiceID
-            .col-sm-9
-              input#Invoice.form-control(name='Invoice', placeholder='Invoice')
-          //.form-group
-            label.col-sm-3.col-form-label(for='PubAddress') Public Address
-            .col-sm-9
-              input#PubAddress.form-control(name='PubAddress', placeholder='Address')
-          .form-group
-            label.col-sm-3.col-form-label(for='Amount') Monto BsS
-            .col-sm-9
-              input#BsSAmount.form-control(name='Amount', placeholder='Monto BsS',type='number',step='0.01',min=0)          
-          .form-group
-            label.col-sm-3.col-form-label(for='DashAmount') Monto Dash
-            .col-sm-9
-              input#DashAmount.form-control(name='DashAmount', placeholder='Monto Dash' readonly)   
-              button(type='submit', value='Submit', style='margin-top: 23px;') Submit
-              script(src='js/exchange.js')     
+    .col-md-6.offset-md-3
+      - var rate = `${DataToRender.rate}`
+      if rate == 'NaN' 
+          p There was an error with the exchange rate, please try again.
+      else
+          h1= title
+          p 
+            | 1 Dash = 
+            span#ExRa #{DataToRender.rate}
+            |  BsS
+          form(action='/submit', method='POST')
+            .form-group
+              label.col-sm-3.col-form-label(for='Invoice') InvoiceID
+              .col-sm-9
+                input#Invoice.form-control(name='Invoice', placeholder='Invoice')
+            //.form-group
+              label.col-sm-3.col-form-label(for='PubAddress') Public Address
+              .col-sm-9
+                input#PubAddress.form-control(name='PubAddress', placeholder='Address')
+            .form-group
+              label.col-sm-3.col-form-label(for='Amount') Monto BsS
+              .col-sm-9
+                input#BsSAmount.form-control(name='Amount', placeholder='Monto BsS',type='number',step='0.01',min=0)          
+            .form-group
+              label.col-sm-3.col-form-label(for='DashAmount') Monto Dash
+              .col-sm-9
+                input#DashAmount.form-control(name='DashAmount', placeholder='Monto Dash' readonly)   
+                button(type='submit', value='Submit', style='margin-top: 23px;') Submit
+                script(src='js/exchange.js')     
 
     
 

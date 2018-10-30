@@ -1,0 +1,76 @@
+#mainback {
+    background-image: url('/img/back1.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+#mainmiddle {
+    margin-top:30px
+}
+div.imagelogo {
+    content:url('/img/logoleft.png');
+    width: 300px;
+    height: 80px;
+    margin-top: 15px;
+ }​
+ .countdown .flip-clock-wrapper{
+    margin-top: 30px;
+    margin-left: 90px;
+    margin-right: 0px;
+}
+
+.flip-clock-dot.top {
+top: 10px;
+}
+
+.flip-clock-dot.bottom {
+bottom: 0;
+top: 25px;
+}
+
+.flip-clock-dot{
+width: 7px;
+height: 7px;
+}
+.flip-clock-label{
+display: none;
+}
+
+.flip-clock-divider {
+    width: 17px;
+    height: 45px;
+    }
+
+.flip-clock-wrapper ul {width: 30px;height: 49px;margin: 0 1px;}
+.flip-clock-wrapper ul li {line-height: 49px;}
+.flip-clock-wrapper ul li a div div.inn {border-radius: 2px;font-size: 35px; color: #052944; text-shadow: 0 1px 1px #555; background : whitesmoke;}
+.flip-clock-wrapper ul li a div.down {border-bottom-left-radius: 1px; border-bottom-right-radius: 1px;}
+.flip-clock-wrapper ul li a div.up:after {top: 23px;height: 1px;}
+.flip-clock-dot
+{
+    background : whitesmoke;
+}
+
+#top{
+    display: inline-flex;
+}
+.cost{
+    margin-top: 20px;
+    margin-bottom: 0px;
+    font-family: sans-serif;
+    text-align: -webkit-center;
+    font-size: xx-large;
+}
+.costBs{
+    margin-top: 0px; 
+    margin-bottom: 0px;
+    font-family: sans-serif;
+    text-align: -webkit-center;
+    font-size: xx-large;
+}
+.itemdesc{
+    margin-top: 0px;
+    margin-bottom: 10px;
+    font-family: sans-serif;
+    text-align: -webkit-center;
+    font-size: large;
+}
