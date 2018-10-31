@@ -381,26 +381,9 @@ body {
   z-index:1
 }
 
-.topdiv{
-  position: absolute;
-  z-index:3;
-  padding-left: 80px;
-  padding-top: 80px;
-}
-
-.topdivchecked{
-  position: absolute;
-  z-index:3;
-  padding-left: 80px;
-}
 
 
-.blurmed{
-  filter: blur(5px);
-  z-index:2;
- 
-   /*background-color: #ccc;*/
-}
+
 
 
 }

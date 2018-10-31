@@ -18,11 +18,22 @@ block content
                     p.cost Precio: #{data.Amount} Dash
                     p.costBs #{data.AmountBsS} BsS
                     p.itemdesc #{data.InvoiceID}
-                    div(style='display: -webkit-inline-box;')
-                        #RAddress.subdiv  
-                        p This is the address that is about to be acredited:&nbsp 
-                        span#HexAddr  #{data.SimpleAddress}                     
+                    #RAddress
+                    #mainHexButton
+                        #HexButton
+                            button#bot(title='Haga click aqui para copiar la direcion',onclick="copyThat()")
+                            input#HexAddr(type='text', value=`${data.SimpleAddress}`,readonly) 
+                    #dashText          
+                        p.dashTextUp     
+                        p.dashTextDown   
+                    #dashHelp          
+                        p.dashHelpUp     
+                        p.dashHelpDown 
+                    #dashSupport
+                        p.dashSC
+                        p.dashSCPN                  
                     script(src='js/simplebundle.js')
+                    script(src='js/copied.js')     
                     //script(src='js/time.js')
                     script(type='text/javascript').
                         new QRCode(document.getElementById("RAddress"), "#{data.RAddress}");

@@ -1,7 +1,8 @@
 var request = require('request');
 function checkTx(/*callback*/){
   console.log('entra en checkTX');
-  var address= $('#HexAddr').text();
+  var address= $('#HexAddr').val();
+  console.log(address);
   request.get(
       "https://api.blockcypher.com/v1/dash/main/txs",
       { json: { key: 'value' } },
@@ -13,9 +14,8 @@ function checkTx(/*callback*/){
                 for(var o = 0; o < addressUN.length;o++){
                     if (addressUN[o].trim() == address.trim()){    
                         //here the blur               
-                        $('#timerqr').addClass("blurmed");
-                        $('#maindv').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dashnew.svg" class="ld ld-coin-h" /></div>')
-                        clearInterval(refreshIntervalId);
+                        $('#RAddress').addClass("blurmed");
+                        $('#RAddress').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dashnew.svg" class="ld ld-coin-h" />')                        //clearInterval(refreshIntervalId);
                         console.log("Payment received");
                         var hash = body[i].hash;
                         var data = {
@@ -34,12 +34,16 @@ function checkTx(/*callback*/){
                             data: data,
                             success: function(a) {                           
                               console.log('Success AJAX');
-                              $('#middle').append(a);
-                              $('#DashLoader').removeClass("ld");
-                              $('#maindv').prepend('<div class = "topdivchecked"><img id="DashCompleted" style="width:100px;height:100px;animation-duration:12.0s" src="img/checkdash.svg" class="ld ld-jump" /></div>')
+                              //$('#middle').append(a);
+                              $('.topdiv').hide();
+                              //$('#DashLoader').removeClass("ld");
+                              $('#RAddress').prepend('<div class = "topdivchecked"><img id="DashCompleted" style="width:250px;height:250px;animation-duration:1.0s" src="img/check.png" class="ld ld-tick" /></div>')
                               //console.log(a);
                               //$("#timerqr").removeClass("blurmed");
                               //window.location.href="http://localhost:3000/contact";
+                              setTimeout(function () {
+                            $('#Dashcompleted').addClass("ld");
+                                }, 2000); 
                             },
                             error: function (e) {
                                 console.log('Error on AJAX');
