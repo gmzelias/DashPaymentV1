@@ -4,7 +4,7 @@ function checkTx(/*callback*/){
   var address= $('#HexAddr').val();
   console.log(address);
   request.get(
-      "https://api.blockcypher.com/v1/dash/main/txs",
+      "https://api.blockcypher.com/v1/dash/main/txs?token=289e2c20eaee4ba7961cf55ab07728c8",
       { json: { key: 'value' } },
       function (error, response, body) {
           //console.log(body);
@@ -15,7 +15,8 @@ function checkTx(/*callback*/){
                     if (addressUN[o].trim() == address.trim()){    
                         //here the blur               
                         $('#RAddress').addClass("blurmed");
-                        $('#RAddress').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dashnew.svg" class="ld ld-coin-h" />')                        //clearInterval(refreshIntervalId);
+                        $('#QR').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dashnew.svg" class="ld ld-coin-h" />')      
+                        clearInterval(refreshIntervalId);
                         console.log("Payment received");
                         var hash = body[i].hash;
                         var data = {
@@ -32,17 +33,24 @@ function checkTx(/*callback*/){
                             type: "POST",
                             url: "/contact",
                             data: data,
-                            success: function(a) {                           
+                            success: function(a) {        
+                              clock.stop();                     
                               console.log('Success AJAX');
                               //$('#middle').append(a);
                               $('.topdiv').hide();
                               //$('#DashLoader').removeClass("ld");
-                              $('#RAddress').prepend('<div class = "topdivchecked"><img id="DashCompleted" style="width:250px;height:250px;animation-duration:1.0s" src="img/check.png" class="ld ld-tick" /></div>')
+                              $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashCompleted" class="ld ld-tick" /></div>')
+                              $('#HexButton').remove();
+                              $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Success"/></div>')
+                              $('.dashTextUp').remove();
+                              $('.dashTextDown').remove();
+                              $('#dashText').append('<div class ="bigEntrance"><button id="submit"></button>')
+
                               //console.log(a);
                               //$("#timerqr").removeClass("blurmed");
                               //window.location.href="http://localhost:3000/contact";
                               setTimeout(function () {
-                            $('#Dashcompleted').addClass("ld");
+                                $('#DashCompleted').removeClass("ld");
                                 }, 2000); 
                             },
                             error: function (e) {
@@ -93,7 +101,7 @@ bar2.set(mSeconds);
 if (mSecondsSuccess % 10000 == 0 ){
    // checkTx();
 }*/
-//checkTx();//ActivateTX
+checkTx();//ActivateTX
 }
 
 var refreshIntervalId = setInterval(rex,10000);

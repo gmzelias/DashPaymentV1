@@ -1,7 +1,7 @@
 extend layout.pug
 
 block content
-    #mainback.col-md-6.offset-md-3
+    #mainback.col-sm-6.offset-sm-3
         #top
             .imagelogo
             .countdown
@@ -18,11 +18,12 @@ block content
                     p.cost Precio: #{data.Amount} Dash
                     p.costBs #{data.AmountBsS} BsS
                     p.itemdesc #{data.InvoiceID}
-                    #RAddress
-                    #mainHexButton
-                        #HexButton
-                            button#bot(title='Haga click aqui para copiar la direcion',onclick="copyThat()")
-                            input#HexAddr(type='text', value=`${data.SimpleAddress}`,readonly) 
+                    #QR
+                        #RAddress
+                        #mainHexButton
+                            #HexButton
+                                button#bot(title='Haga click aqui para copiar la direcion',onclick="copyThat()")
+                                input#HexAddr(type='text', value=`${data.SimpleAddress}`,readonly) 
                     #dashText          
                         p.dashTextUp     
                         p.dashTextDown   
@@ -30,8 +31,8 @@ block content
                         p.dashHelpUp     
                         p.dashHelpDown 
                     #dashSupport
-                        p.dashSC
-                        p.dashSCPN                  
+                        a.dashSC(href='http://www.dashhelpme.com',target="_blank")
+                        a.dashSCPN(href='tel:+582127201174')                 
                     script(src='js/simplebundle.js')
                     script(src='js/copied.js')     
                     //script(src='js/time.js')

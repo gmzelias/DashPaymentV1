@@ -106,7 +106,7 @@ router.post('/submit', function (req, res, next) {
     pAddress ="6b558e5e6546d253b6bb1ad85a4dcaaac9fb42a8d68a661122854a3926ebb896";
     callback(address,wif,pAddress);*/
     request.post(
-      "https://api.blockcypher.com/v1/dash/main/addrs",
+      "https://api.blockcypher.com/v1/dash/main/addrs?token=289e2c20eaee4ba7961cf55ab07728c8",
       { json: { key: 'value' } },
       function (error, response, body) {
           if (!error && response.statusCode == 201) {
@@ -274,7 +274,7 @@ router.post('/contact', function (req, res) {
   function getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation){
     var total; //= 1000;//+ body.fees; // Attention with the total!!!!!!!!!
     request.get(
-      "https://api.blockcypher.com/v1/dash/main/txs/"+hash,
+      "https://api.blockcypher.com/v1/dash/main/txs/"+hash+"?token=289e2c20eaee4ba7961cf55ab07728c8",
       { json: { key: 'value' } },
       function (error, response, body) {
           if (!error && response.statusCode == 200) {
@@ -378,7 +378,7 @@ router.post('/contact', function (req, res) {
         //value = Math.floor((value / 2));                       //  REVERSE to make 2 tx
         console.log('****************Value*****************: '+ value );
         var options = {
-          uri: 'https://api.blockcypher.com/v1/dash/main/txs/new',
+          uri: 'https://api.blockcypher.com/v1/dash/main/txs/new?token=289e2c20eaee4ba7961cf55ab07728c8',
           method: 'POST',
           json: {
             confirmations:0,
@@ -453,7 +453,7 @@ router.post('/contact', function (req, res) {
 
       function SendTx(tx,toSign,signatures,pubkeys,forcedvalue,forcedfee,callback){
         var options = {
-          uri: 'https://api.blockcypher.com/v1/dash/main/txs/send',
+          uri: 'https://api.blockcypher.com/v1/dash/main/txs/send?token=289e2c20eaee4ba7961cf55ab07728c8',
           method: 'POST',
           json: {
             tx: tx,
