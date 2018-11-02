@@ -70335,6 +70335,7 @@ function checkTx(/*callback*/){
                         $('#RAddress').addClass("blurmed");
                         $('#QR').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dashnew.svg" class="ld ld-coin-h" />')      
                         clearInterval(refreshIntervalId);
+                        clearInterval(clocktimer);
                         console.log("Payment received");
                         var hash = body[i].hash;
                         var data = {
@@ -70352,9 +70353,12 @@ function checkTx(/*callback*/){
                             url: "/contact",
                             data: data,
                             success: function(a) {        
-                              clock.stop();                     
+                              //clock.stop();                     
                               console.log('Success AJAX');
                               //$('#middle').append(a);
+                              $('#RAddress').addClass("hideQR");
+                              $('.itemdesc').hide();
+                              $('.costBs').hide();
                               $('.topdiv').hide();
                               //$('#DashLoader').removeClass("ld");
                               $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashCompleted" class="ld ld-tick" /></div>')
@@ -70389,14 +70393,15 @@ function checkTx(/*callback*/){
           }
       });
 };
-var clock = $('.countdown').FlipClock(4000,{
+/*   var clock = $('.countdown').FlipClock(4000,{
     countdown:true,
     clockFace: 'MinuteCounter',
 	onDestroy: function() {
 		// Do something
 	}
     });
-    clock.setTime(900);
+    clock.setTime(900);*/
+
    /* var bar2 = new ldBar(".ldBar", {
     "value":60000,
     "stroke": '#f00',
@@ -70421,7 +70426,6 @@ if (mSecondsSuccess % 10000 == 0 ){
 }*/
 checkTx();//ActivateTX
 }
-
 var refreshIntervalId = setInterval(rex,10000);
 refreshIntervalId;
 

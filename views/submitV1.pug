@@ -1,0 +1,52 @@
+extend layout.pug
+
+block content
+    #mainback.col-sm-6.offset-sm-3
+        #top
+            .imagelogo
+            .countdown
+                span#time
+        |
+        .row
+            #mainmiddle           
+                - var language = `${data.validated}`
+                if language == 'false' 
+                    p There was an error with the data, please try again.
+                else
+                    #pr_a(hidden='') #{data.privateAddress}
+                    #pu_a(hidden='') #{data.publicAddress}
+                    #add_rr(hidden='') #{data.Address}
+                    p.cost Precio: #{data.Amount} Dash
+                    p.costBs #{data.AmountBsS} BsS
+                    p.itemdesc #{data.InvoiceID}
+                    #QR
+                        #RAddress
+                        #mainHexButton
+                            #HexButton
+                                button#bot(title='Haga click aqui para copiar la direcion',onclick="copyThat()")
+                                input#HexAddr(type='text', value=`${data.SimpleAddress}`,readonly) 
+                    #dashText          
+                        p.dashTextUp     
+                        p.dashTextDown   
+                    #dashHelp          
+                        p.dashHelpUp     
+                        p.dashHelpDown 
+                    #dashSupport
+                        a.dashSC(href='http://www.dashhelpme.com',target="_blank")
+                        a.dashSCPN(href='tel:+582127201174')                 
+                    script(src='js/simplebundle.js')
+                    script(src='js/copied.js')     
+                    //script(src='js/time.js')
+                    script(type='text/javascript').
+                        startTimer(60 * 5, $('#time'));
+                        new QRCode(document.getElementById("RAddress"), "#{data.RAddress}");                      
+                        //$('#tiqr').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dash.svg" class="ld ld-coin-h" /></div>')
+                        /*   setTimeout(function () {
+                            $('#timerqr').addClass("blurmed");
+                        }, 2000);
+                        setTimeout(function () {
+                            $('#maindv').prepend('<div id="dashspinner" class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dash.svg" class="ld ld-coin-h" /></div>')
+                        }, 4000);
+                                    setTimeout(function () {
+                            $('#maindv').prepend('<div class = "topdivchecked"><img id="DashCompleted" style="width:100px;height:100px;" src="img/checkdash.svg" class="ld ld-heartbeat" /></div>')
+                        }, 6000);*/

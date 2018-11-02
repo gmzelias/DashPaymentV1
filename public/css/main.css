@@ -11,12 +11,9 @@ div.imagelogo {
     content:url('/img/logoleft.png');
     width: 300px;
     height: 80px;
-    margin-top: 15px;
+    margin-top: 10px;
+    margin-left: 10px;
  }​
- .countdown .flip-clock-wrapper{
-    margin-top: 30px;
-    margin-right: 0px;
-}
 
 .flip-clock-dot.top {
 top: 10px;
@@ -52,6 +49,8 @@ display: none;
 
 #top{
     display: inline-flex;
+    display: flex;
+    justify-content: space-between;
 }
 .cost{
     color:#656565;
@@ -174,7 +173,7 @@ p.customfont {
   .topdiv{
     position: absolute;
     z-index:3;
-    width: 100%;
+    width: 105%;
     height: 30%;
     display: flex;
     flex-direction: row;
@@ -186,7 +185,8 @@ p.customfont {
 .topdivchecked{
     position: absolute;
     z-index:3;
-    width: 100%;
+    margin-top: 25px;
+    width: 105%;
     height: 31%;
     display: flex;
     flex-direction: row;
@@ -230,4 +230,37 @@ p.customfont {
     zoom:0.75;
 }
 
+.hideQR{
+    visibility: hidden;
+}
+
+#time{
+    width: 200px;
+    height: 200px;
+    color: #052944;
+    font-family: "Latobold", Verdana, Tahoma;
+    font-size: xx-large;
+    padding:5px;
+}
+
+.countdown{
+    height: 48px;
+    margin-top: 30px;
+    margin-right: 10px;
+    border-radius: 10px;
+    background: #fcfcfc;
+}
+.modal-content{
+    -webkit-box-shadow: 0 5px 15px rgba(0,0,0,0);
+    -moz-box-shadow: 0 5px 15px rgba(0,0,0,0);
+    -o-box-shadow: 0 5px 15px rgba(0,0,0,0);
+    box-shadow: 0 5px 15px rgba(0,0,0,0);
+    border:none;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px; 
+}
+.modal-body{
+    padding: 0px;
+}
   
