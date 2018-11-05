@@ -82,11 +82,6 @@ router.post('/submit', function (req, res, next) {
   //0230a79feadf80e4ab414eb545ea98bb214a78a235992af68e25b4201365f52c81 pub
   //c750ab04faaa7e1bf51426d6dde96330d415544f28fd313b6010ec19b761e28e priv
   console.log(result+" resultado");*/
-
-
-
-
-
 /*var tools = require('../public/js/quey');
   tools.foo; */
             /*"private": "6b558e5e6546d253b6bb1ad85a4dcaaac9fb42a8d68a661122854a3926ebb896",

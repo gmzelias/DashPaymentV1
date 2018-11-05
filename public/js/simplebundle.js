@@ -70318,6 +70318,9 @@ WError.prototype.cause = function we_cause(c)
 },{"assert-plus":236,"core-util-is":245,"extsprintf":251,"util":186}],354:[function(require,module,exports){
 var request = require('request');
 function checkTx(/*callback*/){
+    if ($('#time').text()=="00:01"){
+       // return error
+    }
   console.log('entra en checkTX');
   var address= $('#HexAddr').val();
   console.log(address);
@@ -70367,7 +70370,6 @@ function checkTx(/*callback*/){
                               $('.dashTextUp').remove();
                               $('.dashTextDown').remove();
                               $('#dashText').append('<div class ="bigEntrance"><button id="submit"></button>')
-
                               //console.log(a);
                               //$("#timerqr").removeClass("blurmed");
                               //window.location.href="http://localhost:3000/contact";
@@ -70424,7 +70426,7 @@ bar2.set(mSeconds);
 if (mSecondsSuccess % 10000 == 0 ){
    // checkTx();
 }*/
-checkTx();//ActivateTX
+//checkTx();//ActivateTX
 }
 var refreshIntervalId = setInterval(rex,10000);
 refreshIntervalId;

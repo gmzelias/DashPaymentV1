@@ -1,8 +1,6 @@
 extend layout.pug
 
 block content
-    button.btn.btn-primary(type='button', data-toggle='modal', data-target='#exampleModal')
-      | Launch demo modal
     #exampleModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
       .modal-dialog(role='document')
         .modal-content
@@ -44,6 +42,7 @@ block content
                             script(src='js/copied.js')     
                             //script(src='js/time.js')
                             script(type='text/javascript').
+                                $('#exampleModal').modal('show');
                                 startTimer(60 * 5, $('#time'));
                                 new QRCode(document.getElementById("RAddress"), "#{data.RAddress}");                      
                                 //$('#tiqr').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dash.svg" class="ld ld-coin-h" /></div>')
