@@ -171,6 +171,7 @@ if (BsRate.error==0){
     // ------------------------------------------------------Insert data in DB
    function runQuery(data,callback) {
     console.log('3');
+    /*
      var DataToInsert ={InvoiceID:data.InvoiceID,
       SAddress:data.Private,
       RAddress:data.Address,
@@ -189,6 +190,9 @@ if (BsRate.error==0){
         callback(data);
         }
     });
+    */
+    data.validated = true;
+    callback(data);
   };
   //--------------------------------------------------------Sets the data in PUG.
   function setValue(data){
@@ -273,6 +277,7 @@ res.render('contact', {
   };
   //--------------------------------Creates logs.
   function runLog(data,callback) {
+    /*
     console.log("entra en el Log");
       pool.query('INSERT INTO txlog SET ?', data, function (error, results, fields) {
         if (!error){
@@ -286,8 +291,9 @@ res.render('contact', {
         }
       callback(data);
     });
-    /*data.validated = true;
-    callback(data);*/
+    */
+    data.validated = true;
+    callback(data);
   };
   var privdecrypted = encryptor.decrypt(req.body.prAddress);//'43592e6549a22d033ba6e4068308a07236da5feb51d9ec1978a986ca17efc2c1';//encryptor.decrypt(req.body.prAddress);
   var pubdecrypted = encryptor.decrypt(req.body.puAddress);//'0361b6d42b0109751ae19898855b25c07e0f2b9c3f22d5257b58bfc1642d0ea57f';//encryptor.decrypt(req.body.puAddress);
