@@ -70319,13 +70319,62 @@ WError.prototype.cause = function we_cause(c)
 var request = require('request');
 function checkTx(/*callback*/){
     if ($('#time').text()=="00:01"){
-       // return error
+        clearInterval(refreshIntervalId);
+        clearInterval(clocktimer);
     }
-  console.log('entra en checkTX');
+
+    
+    //FOR TESTING PURPOSE ONLY
+    clearInterval(refreshIntervalId);
+    clearInterval(clocktimer);
+    var data = {
+        hash: "ssssss",
+        address: "ssss",
+        prAddress: $('#pr_a').text(),
+        puAddress: $('#pu_a').text(),
+        Address: $('#add_rr').text(),
+        eid: $('#eid').text()
+    };
+    $.ajax({
+        type: "POST",
+        url: "/contact",
+        data: data,
+        success: function(a) {        
+          //clock.stop();                     
+          console.log('Success AJAX');
+          //$('#middle').append(a);
+          $('#RAddress').addClass("hideQR");
+          $('.itemdesc').hide();
+          $('.costBs').hide();
+          $('.topdiv').hide();
+          //$('#DashLoader').removeClass("ld");
+          $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashCompleted" class="ld ld-tick" /></div>')
+          $('#HexButton').remove();
+          $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Success"/></div>')
+          $('.dashTextUp').remove();
+          $('.dashTextDown').remove();
+          $('#dashText').append('<div class ="bigEntrance"><button id="submit"></button>')
+          //console.log(a);
+          //$("#timerqr").removeClass("blurmed");
+          //window.location.href="http://localhost:3000/contact";
+          setTimeout(function () {
+            $('#DashCompleted').removeClass("ld");
+            }, 2000); 
+        },
+        error: function (e) {
+            console.log('Error on AJAX');
+            console.log(e);
+        },
+    });
+
+
+    
+ /*console.log('entra en checkTX');
   var address= $('#HexAddr').val();
   console.log(address);
+  
   request.get(
-      "https://api.blockcypher.com/v1/dash/main/txs?token=289e2c20eaee4ba7961cf55ab07728c8",
+      "https://api.blockcypher.com/v1/dash/main/txs?token=cc0b3cdc830d431e8405d448c1f9c335",
       { json: { key: 'value' } },
       function (error, response, body) {
           //console.log(body);
@@ -70346,7 +70395,8 @@ function checkTx(/*callback*/){
                             address: address,
                             prAddress: $('#pr_a').text(),
                             puAddress: $('#pu_a').text(),
-                            Address: $('#add_rr').text()
+                            Address: $('#add_rr').text(),
+                            eid: $('#eid').text()
                         };
                         o = addressUN.length;
                         i =  body.length;   
@@ -70393,8 +70443,12 @@ function checkTx(/*callback*/){
           else{
             alert("Confirmation Error (API)");
           }
-      });
+      });*/
 };
+
+
+
+
 /*   var clock = $('.countdown').FlipClock(4000,{
     countdown:true,
     clockFace: 'MinuteCounter',
@@ -70426,9 +70480,9 @@ bar2.set(mSeconds);
 if (mSecondsSuccess % 10000 == 0 ){
    // checkTx();
 }*/
-//checkTx();//ActivateTX
+checkTx();//ActivateTX
 }
-var refreshIntervalId = setInterval(rex,10000);
+var refreshIntervalId = setInterval(rex,5000);
 refreshIntervalId;
 
 },{"request":296}]},{},[354]);

@@ -13,13 +13,28 @@ block content
                 |
                 .row
                     #mainmiddle           
-                        - var language = `${data.validated}`
-                        if language == 'false' 
-                            p There was an error with the data, please try again.
-                        else
+                        - var IsError = `${data.validated}`
+                        if IsError == 'address' 
+                            p.itemdesc There was an error generating address, please try again.
+                            script(type='text/javascript').
+                                $('#exampleModal').modal('show');
+                        if IsError == 'currency' 
+                            p.itemdesc There was an error with the currency, please try again.
+                            script(type='text/javascript').
+                                $('#exampleModal').modal('show');
+                        if IsError == 'headers' 
+                            p.itemdesc Missing request information, please try again.
+                            script(type='text/javascript').
+                                $('#exampleModal').modal('show');       
+                        if IsError == 'query' 
+                            p.itemdesc There was an error on the DB, please try again.
+                            script(type='text/javascript').
+                                $('#exampleModal').modal('show');
+                        if IsError == 'true' 
                             #pr_a(hidden='') #{data.privateAddress}
                             #pu_a(hidden='') #{data.publicAddress}
                             #add_rr(hidden='') #{data.Address}
+                            #eid(hidden='') #{data.RPQ}
                             p.cost Precio: #{data.Amount} Dash
                             p.costBs #{data.AmountBsS} BsS
                             p.itemdesc #{data.InvoiceID}
@@ -38,7 +53,7 @@ block content
                             #dashSupport
                                 a.dashSC(href='http://www.dashhelpme.com',target="_blank")
                                 a.dashSCPN(href='tel:+582127201174')                 
-                            script(src='js/simplebundle.js')
+                            script(src='js/simplebundle.js') //––time.js––
                             script(src='js/copied.js')     
                             //script(src='js/time.js')
                             script(type='text/javascript').

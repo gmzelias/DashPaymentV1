@@ -1,23 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const pjson = require('../test.json');
-//const cars = require('../carsData.json');
 var mysql      = require('mysql');
 var moment = require('moment');
 var addrValidator = require('wallet-address-validator');
-//var dashcore = require('@dashevo/dashcore-lib');
-
-/*var bitcore = require('bitcore-lib-dash');
-var Message = require('bitcore-message-dash');*/
-
 var request = require('request');
-//var dashcore = require('bitcore-lib-dash');
-//var Message = require('bitcore-message-dash');
-var enc/*oder = require('int-encoder');//delete*/
-
 var key = process.env.JWT_SECRET;// 
 var encryptor = require('simple-encryptor')(key);
-const shell = require('shelljs');
+//const shell = require('shelljs');
 var r = require('jsrsasign');
 
 
@@ -65,87 +55,120 @@ function Render(RateInfo){
     DataToRender.rate = RateInfo.rate
   }
   DataToRender.rate = Math.round(DataToRender.rate * 100) / 100
-  console.log(DataToRender);
+ // console.log(DataToRender);
   res.render('index',DataToRender);
 };
 getRate(Render);
 });
 
 
-//Submit Button
-router.post('/submit', function (req, res, next) {
- /* var r = require('jsrsasign');
-  var ec = new r.ECDSA({'curve': 'secp256k1'});  
-  var signed2 = ec.signHex('51c5670b034b78362501cd894514982324130289b02097581a86263f169d9715', 'c750ab04faaa7e1bf51426d6dde96330d415544f28fd313b6010ec19b761e28e');
-  console.log(signed2);                                                                                                   
-  var result = ec.verifyHex('51c5670b034b78362501cd894514982324130289b02097581a86263f169d9715', signed2, '0230a79feadf80e4ab414eb545ea98bb214a78a235992af68e25b4201365f52c81');
-  //0230a79feadf80e4ab414eb545ea98bb214a78a235992af68e25b4201365f52c81 pub
-  //c750ab04faaa7e1bf51426d6dde96330d415544f28fd313b6010ec19b761e28e priv
-  console.log(result+" resultado");*/
-/*var tools = require('../public/js/quey');
-  tools.foo; */
-            /*"private": "6b558e5e6546d253b6bb1ad85a4dcaaac9fb42a8d68a661122854a3926ebb896",
-  
-            "public": "02e91a29b20b2f7458d74f820c4e55137a1b65ed2763e43aadca50a5daa999ff0a",
-            
-            "address": "XuDy7dvHrBfsRbj6w5xm3UQjtAQKGhzFW7",
-            
-            "wif": "XEtGyDUW3QGa8mdWSboyRLCB1VQnFxQryLnczBmoB7kzSoZHBHMx"*/
 
-  //Generate key and addresses
+
+
+
+
+
+
+//Submit Button or Main page of payment processor.
+router.get('/submit', function (req, res, next) {
+//console.log(req.headers); //Show headers on console.
+if (req.headers.idestablecimiento == undefined || req.headers.monto==undefined || req.headers.contrato==undefined || eval("process.env."+req.headers.idestablecimiento)==undefined){
+  var data = {
+    validated:"headers"// Error with currency
+  }
+  res.render('submit', {data});
+  return;
+}
+//-------------------------------------------------------------------------Get BsS rate
+function getRate(callback){
+RateInfo = {error:0,
+            rate:0}
+var options = {uri: 'https://dash.casa/api/?cur=VES',
+              method: 'GET'};
+request(options, function (error, response, body) {   
+  if (!error && response.statusCode == 200) {
+    var JsonBody = JSON.parse(body);
+    RateInfo.error=JsonBody.errcode;
+    RateInfo.rate=JsonBody.dashrate;
+  }
+ else{
+   RateInfo.error=1;}
+   callback(RateInfo);
+});
+};
+
+//-----------------------------------------------------------------Covert BsS into Dash
+function AssignBs(RateInfo){
+var BsRate = RateInfo;
+if (BsRate.error==0){
+  var rate = BsRate.rate;
+  var exchange = ((req.headers.monto) / rate)+0.00000500; // 500 Duff added as a Flat Fee
+  exchange = exchange.toFixed(8);
+//-----------------------------------------------------------------Generate dynamic address information
   function getInformation(callback){
     console.log('1');
-    //CABLE
+    //CABLE'S BEGIN
     /*address ="XuDy7dvHrBfsRbj6w5xm3UQjtAQKGhzFW7";
     wif ="";
     pAddress ="6b558e5e6546d253b6bb1ad85a4dcaaac9fb42a8d68a661122854a3926ebb896";
     callback(address,wif,pAddress);*/
+    //CABLE'S END
     request.post(
-      "https://api.blockcypher.com/v1/dash/main/addrs?token=289e2c20eaee4ba7961cf55ab07728c8",
+      "https://api.blockcypher.com/v1/dash/main/addrs?token=cc0b3cdc830d431e8405d448c1f9c335",
       { json: { key: 'value' } },
       function (error, response, body) {
           if (!error && response.statusCode == 201) {
-            Address = {
+             Address = {
               address : body.address,
               wif : body.wif,
               private : body.private,
-              public :body.public
-            }
-            callback(Address);
+              public :body.public,
+              error:0}
           }
           else{
+            Address = {error:1}
             console.log("Error on generating address"); //must be HTML
           }
+          callback(Address);
       });
 };
-      // -------Validate de address
+
+  //-----------------------------------------------------------Validate de address
     function setInformation(Address){
-      console.log(req.body);
      console.log('2');
+     if (Address.error == 0)
+     {
       var data = {
-      validated:'',
-      InvoiceID : req.body.Invoice,
+      validated:true,
+      InvoiceID : req.headers.contrato,
       Private :Address.private,
       Address :  Address.address,
       Wif:Address.wif,
       Public: Address.public,
-      Amount :req.body.DashAmount, 
-      AmountBsS : req.body.Amount,
+      Amount :exchange, 
+      AmountBsS : req.headers.monto,
       Date :moment().format('llll')
       }
-     
       var addrCheck = addrValidator.validate(data.Address, 'DASH');
       console.log('2.5');
-      console.log(addrCheck);
       if(addrCheck)
         runQuery(data,setValue)
      else
      {
-       data.validated = false;
+      console.log('Error with address');
+       data.validated = "address";
        res.render('submit', {data});
       }
-};
-    // ----Inserts data in DB
+    }else{
+      var data = {
+        validated:"address",
+      }
+      console.log('Error with address');
+      res.render('submit', {data});
+    }
+
+    };
+    // ------------------------------------------------------Insert data in DB
    function runQuery(data,callback) {
     console.log('3');
      var DataToInsert ={InvoiceID:data.InvoiceID,
@@ -153,61 +176,41 @@ router.post('/submit', function (req, res, next) {
       RAddress:data.Address,
       Amount:data.Amount,
       Date:data.Date}
-      /*pool.query('INSERT INTO paymentinfo SET ?', DataToInsert, function (error, results, fields) {
+      pool.query('INSERT INTO paymentinfo SET ?', DataToInsert, function (error, results, fields) {
         if (!error){
         console.log('Query executed.');
         data.validated = true;
+        callback(data);
         }
         else{
         console.log(error);
         console.log('Error while performing Query.');
-        data.validated = false;
+        data.validated = "query";
+        callback(data);
         }
-      callback(data);
-    });*/
-    data.validated = true;
-    callback(data);
+    });
   };
-  //Sets the data in PUG.
-  function setValue(data) {
+  //--------------------------------------------------------Sets the data in PUG.
+  function setValue(data){
     console.log('4');
-  
-    data.SimpleAddress=data.Address;
-    data.RAddress ="dash:"+data.Address+'?amount='+data.Amount;
-    
-    //console.log(data);
-    //Tx Signing
-    /*
-    console.log("-------------------------------------------");
-    console.log("-------------------------------------------");
-    var privateKey = bitcore.PrivateKey.fromWIF(data.pAddress);
-    console.log("La Private");
-    console.log(data.pAddress);
-    var signature = Message('32b5ea64c253b6b466366647458cfd60de9cd29d7dc542293aa0b8b7300cd827').sign(privateKey);
-
-    // const buf1 = Buffer.from('CEztKBAYNoUEEaPYbkyFeXC5v8Jz9RoZH9','hex');
-    const buf2 = Buffer.from(signature, 'utf8').toString('hex');
-    //const buf2 = Buffer.from('02152e2bb5b273561ece7bbe8b1df51a4c44f5ab0bc940c105045e2cc77e618044');
-
-    console.log(signature);
-    console.log(buf2);
-    console.log("-------------------------------------------");
-    console.log("-------------------------------------------");
-    */
+   data.SimpleAddress=data.Address;
+   data.RAddress ="dash:"+data.Address+'?amount='+data.Amount;
    var PrivateEncrypted = encryptor.encrypt(data.Private);
    var PublicEncrypted = encryptor.encrypt(data.Public);
    var AddressEncrypted = encryptor.encrypt(data.Address);
+   var rpq =  encryptor.encrypt(req.headers.idestablecimiento);
    console.log('5');
    data.privateAddress = PrivateEncrypted;
    data.publicAddress = PublicEncrypted;
    data.Address = AddressEncrypted;
+   data.RPQ = rpq;
    res.render('submit', {data});
   };
-    //Generates a brand new address.
-    getInformation(setInformation);
 
-    //Select Query
-   // --------------
+  getInformation(setInformation);
+
+
+   // --------------Select Query
     /*pool.query('SELECT * from paymentinfo', function(err, rows, fields) {
         if (!err)
            console.log('The solution is: ', rows);
@@ -215,8 +218,7 @@ router.post('/submit', function (req, res, next) {
         console.log('Error while performing Query.');
     });*/
 
-    //Activate for POSTMAN use:
-    // ---------------------------
+    // ---------------------------Activate for POSTMAN use:
     /*res.writeHead(200, {"Content-Type": "application/json"});
     var json = JSON.stringify({ 
       Invoice: req.body.Invoice, 
@@ -224,21 +226,55 @@ router.post('/submit', function (req, res, next) {
       Ammount: req.body.Ammount
     });
     res.end(json);*/
+
+  } //----------------------------------if from currency in BsS
+  else{
+    console.log('Error with currency');
+    var data = {
+      validated:"currency"// Error with currency
+    }
+    res.render('submit', {data});
+  }
+}
+ //------------------------------Start!
+getRate(AssignBs);
 });
 
 
 router.post('/contact', function (req, res) {
-  //Callback of creating log
+//ONLY FOR TESTING PURPOSE
+//------------------------------------------------
+res.render('contact', {
+  Errors : 0,
+  Hash:"c1539050b6dc20e40844edaa9ea535bc76ce093471de449289fbf490cc281dfb",
+  DateCompleted:'Tue, Nov 6, 2018 7:52 PM',
+  ValueDash:0.00001710},
+ function(err, html) {
+  res.send({MontoDash: 0.00001710,
+  Hash: "c1539050b6dc20e40844edaa9ea535bc76ce093471de449289fbf490cc281dfb",
+  Status : "Completed",
+  TimeStamp: 'Tue, Nov 6, 2018 7:52 PM' });
+});
+
+
+  //-------------------------------------Merchants ID
+  var eid = encryptor.decrypt(req.body.eid);
+  var MayorAddress = eval("process.env."+eid);
+ /* console.log('ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss');
+  console.log(eid);
+  console.log(MayorAddress);*/
+
+  //-------------------------------Callback of creating log
   function logResponse(res){
     if(res.validated==true){
       console.log("Log created successfully.");
     }else{
-      console.log("Error creating  log.");
-    }
+      console.log("Error creating  log.");}
   };
-  //Creates logs.
+  //--------------------------------Creates logs.
   function runLog(data,callback) {
-    /*  pool.query('INSERT INTO txlog SET ?', data, function (error, results, fields) {
+    console.log("entra en el Log");
+      pool.query('INSERT INTO txlog SET ?', data, function (error, results, fields) {
         if (!error){
         console.log('Query executed.');
         data.validated = true;
@@ -249,47 +285,47 @@ router.post('/contact', function (req, res) {
         data.validated = false;
         }
       callback(data);
-    });*/
-    data.validated = true;
-    callback(data);
+    });
+    /*data.validated = true;
+    callback(data);*/
   };
   var privdecrypted = encryptor.decrypt(req.body.prAddress);//'43592e6549a22d033ba6e4068308a07236da5feb51d9ec1978a986ca17efc2c1';//encryptor.decrypt(req.body.prAddress);
   var pubdecrypted = encryptor.decrypt(req.body.puAddress);//'0361b6d42b0109751ae19898855b25c07e0f2b9c3f22d5257b58bfc1642d0ea57f';//encryptor.decrypt(req.body.puAddress);
   var adrdecrypted = encryptor.decrypt(req.body.Address);//'XrNUrhPrUVnL4CXJ3urXitJhwsUizhxqie';//encryptor.decrypt(req.body.Address);
-  console.log('Address:'+adrdecrypted);
+  /*console.log('Address:'+adrdecrypted);
   console.log('Private:'+privdecrypted);
-  console.log('Public:'+pubdecrypted);
+  console.log('Public:'+pubdecrypted);*/
   var hash = req.body.hash;
   //CHECK CHECK CHECK CHECK
   var address = req.body.address;
   //CHECK CHECK CHECK CHECK
   var confirmation = false;
   var times = 0;
-  //Checks if the first tx has been done (QR SCANNING).
+
+  //----------------------------------------------Checks if the first tx has been done (QR SCANNING).
   function getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation){
     var total; //= 1000;//+ body.fees; // Attention with the total!!!!!!!!!
     request.get(
-      "https://api.blockcypher.com/v1/dash/main/txs/"+hash+"?token=289e2c20eaee4ba7961cf55ab07728c8",
+      "https://api.blockcypher.com/v1/dash/main/txs/"+hash+"?token=cc0b3cdc830d431e8405d448c1f9c335",
       { json: { key: 'value' } },
       function (error, response, body) {
           if (!error && response.statusCode == 200) {
             //No confirmations needed
-
             if (body.confirmations >= 0) {
               //console.log("Confirmations:" +body.confirmations);
               confirmation = true;
               console.log('1st transaction -------------------------------------------');
               console.log(body);
-
              for(var i = 0; i < body.outputs.length;i++){  
                 if(body.outputs[i].addresses == adrdecrypted)
                   total = body.outputs[i].value;    
-              }
-              
-              console.log('End of 1st transaction -------------------------------------------');    
+              }           
+              console.log('End of 1st transaction -------------------------------------------'); 
+               //-------------------------------Create Tx   
               function BigTx(Big){
                 testB = Big.Errors;
-                if (testB==false){          
+                if (testB==false){   
+              //---------------------------------Sign Tx         
               function bigTxCompleted(BigSigned){
                 SignedBig = BigSigned.Errors;
                 if (SignedBig==false){ 
@@ -307,27 +343,37 @@ router.post('/contact', function (req, res) {
                       Hash:BigSigned.Hash,   
                       Date:BigSigned.ActualTime,
                     }
-                  runLog(LogData,logResponse);  
-                  res.render('contact',{
-                    Errors : 0,
-                    Hash:BigSigned.Hash,
-                    DateCompleted:BigSigned.ActualTime,
-                    ValueDash:BigSigned.Value,
-                  });
+                 runLog(LogData,logResponse);  
+                 res.render('contact', {
+                  Errors : 0,
+                  Hash:BigSigned.Hash,
+                  DateCompleted:BigSigned.ActualTime,
+                  ValueDash:BigSigned.Value},
+                 function(err, html) {
+                  res.send({MontoDash: BigSigned.Value+BigSigned.ActualFee,
+                  Hash: BigSigned.Hash,
+                  Status : "Completed",
+                  TimeStamp: BigSigned.ActualTime });
+                });
                     }
                 else{
-                  res.render('contact',{
+                  res.render('contact', {
                     Errors : 1,
                     Hash:BigSigned.Hash,
                     DateCompleted:BigSigned.ActualTime,
-                    ValueDash:BigSigned.Value,
+                    ValueDash:BigSigned.Value},
+                   function(err, html) {
+                    res.send({MontoDash: BigSigned.Value+BigSigned.ActualFee,
+                    Hash: BigSigned.Hash,
+                    Status : "Failed",
+                    TimeStamp: BigSigned.ActualTime });
                   });
                   console.log('Error signing tx');
                     }
                 }
-                //Firmar Big
+              //---------------------------------------------------Firmar Big
                SendTx(Big.tx,Big.toSign,Big.signatures,Big.pubkeys,Big.ForcedValue,Big.ForcedFee,bigTxCompleted);
-                }
+                } //if errors found when creating Tx
                 else{
               console.log('Error creating transaction');
               res.render('contact',{
@@ -340,10 +386,12 @@ router.post('/contact', function (req, res) {
               }
               //Generar Big
               /*setTimeout(function () {*/
-                newTx(adrdecrypted,privdecrypted,pubdecrypted,total,'XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q',1,BigTx); //XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q Dash Official Android
+                newTx(adrdecrypted,privdecrypted,pubdecrypted,total,MayorAddress,1,BigTx); //XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q Dash Official Android
              /* }, 1000); //Timeout!*/
             }
             else{
+              // Code only needed if its necessary that tx has at least one confirmation
+              /*
                 console.log("No se confirmo");
                 setTimeout(function () {
                 console.log('Entramos en el timeout');
@@ -353,27 +401,26 @@ router.post('/contact', function (req, res) {
                 body.confirmations = 3;
                 //VALIDATE WHEN A MINUTE IS COMPLETED
                 getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation)
-                }, 3000); 
+                }, 3000); */
             }
           }
         })
       };
+      //------------------------Function that creates new Tx
       function newTx(adrdecrypted,privdecrypted,pubdecrypted,total,output,percent,callback){
         var ResultObject;
         var input = adrdecrypted; //'XuDy7dvHrBfsRbj6w5xm3UQjtAQKGhzFW7'; <-- where money comes from, generated by blockcypher
-        var output = output;
-        var output2 = 'Xw9tZZGrh3RVb5e68jut1EFMyUSZMpBeqs';
+        console.log(output);
+        //var output2 = 'Xw9tZZGrh3RVb5e68jut1EFMyUSZMpBeqs'; // the 1%   
         var fee = 300; // <-- Forced Fee!
         console.log('Grand Total: '+ total);
         var total =  total - fee;
         var value = Math.round((total * percent));
         /*var value1 = Math.round(value*0.99);
-        var value2 = Math.round(value * 0.01);*/
-
-        //value = Math.floor((value / 2));                       //  REVERSE to make 2 tx
+        var value2 = Math.round(value * 0.01);*/                 //  REVERSE to make 2 tx
         console.log('****************Value*****************: '+ value );
         var options = {
-          uri: 'https://api.blockcypher.com/v1/dash/main/txs/new?token=289e2c20eaee4ba7961cf55ab07728c8',
+          uri: 'https://api.blockcypher.com/v1/dash/main/txs/new?token=cc0b3cdc830d431e8405d448c1f9c335',
           method: 'POST',
           json: {
             confirmations:0,
@@ -385,7 +432,6 @@ router.post('/contact', function (req, res) {
           }
         };
        request(options, function (error, response, body) {
-          //console.log(response.statusCode);
           console.log(body);
           if (!error && response.statusCode == 201) {
             var signatures = [];
@@ -445,10 +491,10 @@ router.post('/contact', function (req, res) {
              }   
         }); 
       };
-
+      //----------------------------------------------------------------Function that signs the new Tx
       function SendTx(tx,toSign,signatures,pubkeys,forcedvalue,forcedfee,callback){
         var options = {
-          uri: 'https://api.blockcypher.com/v1/dash/main/txs/send?token=289e2c20eaee4ba7961cf55ab07728c8',
+          uri: 'https://api.blockcypher.com/v1/dash/main/txs/send?token=cc0b3cdc830d431e8405d448c1f9c335',
           method: 'POST',
           json: {
             tx: tx,
@@ -489,6 +535,7 @@ router.post('/contact', function (req, res) {
             }
         });
       };
+
       getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation);
   });
 
