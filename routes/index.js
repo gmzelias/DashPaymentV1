@@ -9,9 +9,10 @@ var key = process.env.JWT_SECRET;//
 var encryptor = require('simple-encryptor')(key);
 //const shell = require('shelljs');
 var r = require('jsrsasign');
+var rn = require('random-number');
 
 
-var pool      =    mysql.createPool({
+/*var pool      =    mysql.createPool({
   connectionLimit : 100, //important
   host     : 'localhost',
   user     : 'Elias',
@@ -20,9 +21,46 @@ var pool      =    mysql.createPool({
   debug    :  false
 });
 
+var TxPool      =    mysql.createPool({
+  connectionLimit : 100, //important
+  host     : 'localhost',
+  user     : 'Elias',
+  password : '18003154dash',
+  database : 'paymentprocessorlog',
+  debug    :  false
+});*/
+var pool      =    mysql.createPool({
+  connectionLimit : 100, //important
+  host     : 'us-cdbr-iron-east-01.cleardb.net',
+  user     : 'bd41ebdff45aba',
+  password : '784c92dc',
+  database : 'heroku_6919a10d77210f6',
+  debug    :  false
+});
+
+var TxPool      =    mysql.createPool({
+  connectionLimit : 100, //important
+  host     : 'us-cdbr-iron-east-01.cleardb.net',
+  user     : 'bd41ebdff45aba',
+  password : '784c92dc',
+  database : 'heroku_6919a10d77210f6',
+  debug    :  false
+});
+
+
+
 
 //Front Page
 router.get('/', function (req, res) {
+/*if (rows.RowDataPacket === undefined){
+console.log('no existe')
+}
+else{
+  console.log(rows.RowDataPacket);
+}*/
+
+
+
   function getRate(callback){
     RateInfo = {
       error:0,
@@ -170,14 +208,23 @@ if (BsRate.error==0){
     };
     // ------------------------------------------------------Insert data in DB
    function runQuery(data,callback) {
-    console.log('3');
-    /*
-     var DataToInsert ={InvoiceID:data.InvoiceID,
-      SAddress:data.Private,
-      RAddress:data.Address,
-      Amount:data.Amount,
-      Date:data.Date}
-      pool.query('INSERT INTO paymentinfo SET ?', DataToInsert, function (error, results, fields) {
+    console.log('3'); 
+    var rn1= rn.generator({
+      min:  10000,
+      max:  99999,
+      integer: true
+    });
+    var TextToken = rn1();
+    data.TextToken = TextToken;
+     var DataToInsert ={
+      Contrato:data.InvoiceID,
+      DynamicAddress:data.Address,
+      MontoDash:data.Amount,
+      MontoBs:req.headers.monto,
+      TextToken:TextToken.toString(),
+      DateCreated:data.Date,
+      TextTokenStatus:true}
+      pool.query('INSERT INTO paymentlog SET ?', DataToInsert, function (error, results, fields) {
         if (!error){
         console.log('Query executed.');
         data.validated = true;
@@ -190,9 +237,8 @@ if (BsRate.error==0){
         callback(data);
         }
     });
-    */
-    data.validated = true;
-    callback(data);
+    /*data.validated = true;
+    callback(data);*/
   };
   //--------------------------------------------------------Sets the data in PUG.
   function setValue(data){
@@ -203,11 +249,16 @@ if (BsRate.error==0){
    var PublicEncrypted = encryptor.encrypt(data.Public);
    var AddressEncrypted = encryptor.encrypt(data.Address);
    var rpq =  encryptor.encrypt(req.headers.idestablecimiento);
+   var Mbs =  encryptor.encrypt(req.headers.monto);
+   var Cnt =  encryptor.encrypt(req.headers.contrato);
    console.log('5');
    data.privateAddress = PrivateEncrypted;
    data.publicAddress = PublicEncrypted;
    data.Address = AddressEncrypted;
    data.RPQ = rpq;
+   data.Mbs = Mbs;
+   data.Cnt = Cnt;
+   data.TextToken = data.TextToken;
    res.render('submit', {data});
   };
 
@@ -248,6 +299,7 @@ getRate(AssignBs);
 router.post('/contact', function (req, res) {
 //ONLY FOR TESTING PURPOSE
 //------------------------------------------------
+/*
 res.render('contact', {
   Errors : 0,
   Hash:"c1539050b6dc20e40844edaa9ea535bc76ce093471de449289fbf490cc281dfb",
@@ -258,27 +310,27 @@ res.render('contact', {
   Hash: "c1539050b6dc20e40844edaa9ea535bc76ce093471de449289fbf490cc281dfb",
   Status : "Completed",
   TimeStamp: 'Tue, Nov 6, 2018 7:52 PM' });
-});
-
+});*/
 
   //-------------------------------------Merchants ID
-  var eid = encryptor.decrypt(req.body.eid);
-  var MayorAddress = eval("process.env."+eid);
- /* console.log('ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss');
-  console.log(eid);
-  console.log(MayorAddress);*/
-
+  var Eid = encryptor.decrypt(req.body.Eid);
+  var Mbs = encryptor.decrypt(req.body.Mbs);
+  var Cnt = encryptor.decrypt(req.body.Cnt);
+  var MayorAddress = eval("process.env."+Eid);
+  console.log(Eid);
+  console.log(MayorAddress);
+  //
   //-------------------------------Callback of creating log
   function logResponse(res){
     if(res.validated==true){
       console.log("Log created successfully.");
-    }else{
+    }if(res.validated==false){
       console.log("Error creating  log.");}
   };
+
   //--------------------------------Creates logs.
-  function runLog(data,callback) {
-    /*
-    console.log("entra en el Log");
+
+  /*function runLog(data,callback) {
       pool.query('INSERT INTO txlog SET ?', data, function (error, results, fields) {
         if (!error){
         console.log('Query executed.');
@@ -291,10 +343,33 @@ res.render('contact', {
         }
       callback(data);
     });
-    */
+    };*/
+
+    function runTx(data,callback) {
+      //altertable
+      pool.query('SELECT ID, TextToken FROM paymentlog WHERE Contrato = '+data.Contrato+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
+          var FK_PaymentId = rows[0].ID;
+          var TextToken = rows[0].TextToken;
+          pool.query('UPDATE paymentlog SET TextTokenStatus = false WHERE  TextToken = '+TextToken+'');   
+          data.FK_PaymentId = FK_PaymentId;
+      });   
+      TxPool.query('INSERT INTO txinfo SET ?', data, function (error, results, fields) {
+        if (!error){
+        console.log('Query executed.');
+        data.validated = true;
+        }
+        else{
+        console.log(error);
+        console.log('Error while performing Query.');
+        data.validated = false;
+        }
+        callback(data);
+      });
+    }
+    /*
     data.validated = true;
     callback(data);
-  };
+    */
   var privdecrypted = encryptor.decrypt(req.body.prAddress);//'43592e6549a22d033ba6e4068308a07236da5feb51d9ec1978a986ca17efc2c1';//encryptor.decrypt(req.body.prAddress);
   var pubdecrypted = encryptor.decrypt(req.body.puAddress);//'0361b6d42b0109751ae19898855b25c07e0f2b9c3f22d5257b58bfc1642d0ea57f';//encryptor.decrypt(req.body.puAddress);
   var adrdecrypted = encryptor.decrypt(req.body.Address);//'XrNUrhPrUVnL4CXJ3urXitJhwsUizhxqie';//encryptor.decrypt(req.body.Address);
@@ -337,7 +412,7 @@ res.render('contact', {
                 if (SignedBig==false){ 
                   console.log('Tx completed.');
                     //Generate Log
-                    var LogData = {
+                  /*  var LogData = {
                       InputAddress :BigSigned.Input,
                       OutputAddress:BigSigned.Output, 
                       ForcedValue:BigSigned.ForcedValue,
@@ -348,8 +423,19 @@ res.render('contact', {
                       Preference:BigSigned.Preference,
                       Hash:BigSigned.Hash,   
                       Date:BigSigned.ActualTime,
+                    }*/
+
+                    var TxData = {
+                      ID_Establecimiento : Eid,
+                      MontoBs: Mbs, 
+                      Contrato: Cnt,
+                      MontoDash: BigSigned.Value+BigSigned.ActualFee,
+                      Hash: BigSigned.Hash,
+                      Status : "Completed",
+                      DateCompleted: BigSigned.ActualTime
                     }
-                 runLog(LogData,logResponse);  
+               /*  runLog(LogData,logResponse);*/
+                 runTx(TxData,logResponse);
                  res.render('contact', {
                   Errors : 0,
                   Hash:BigSigned.Hash,
@@ -363,6 +449,16 @@ res.render('contact', {
                 });
                     }
                 else{
+                  var TxData = {
+                    ID_Establecimiento : Eid,
+                    MontoBs: Mbs, 
+                    Contrato: Cnt,
+                    MontoDash: BigSigned.Value+BigSigned.ActualFee,
+                    Hash: BigSigned.Hash,
+                    Status : "Failed",
+                    Date: BigSigned.ActualTime
+                  }
+                  runTx(TxData,logResponse);
                   res.render('contact', {
                     Errors : 1,
                     Hash:BigSigned.Hash,
@@ -381,12 +477,22 @@ res.render('contact', {
                SendTx(Big.tx,Big.toSign,Big.signatures,Big.pubkeys,Big.ForcedValue,Big.ForcedFee,bigTxCompleted);
                 } //if errors found when creating Tx
                 else{
-              console.log('Error creating transaction');
+                  console.log('Error creating transaction');
+                  var TxData = {
+                    ID_Establecimiento : Eid,
+                    MontoBs: Mbs, 
+                    Contrato: Cnt,
+                    MontoDash: Big.ForcedValue+Big.ForcedFee,
+                    Hash: BigSigned.Hash,
+                    Status : "Failed",
+                    Date: BigSigned.ActualTime
+                  }
+                  runTx(TxData,logResponse);
               res.render('contact',{
                 Errors : 1,
                 Hash:BigSigned.Hash,
                 DateCompleted:BigSigned.ActualTime,
-                ValueDash:BigSigned.Value,
+                ValueDash:Big.ForcedValue+Big.ForcedFee,
               });       
                 }
               }
@@ -536,7 +642,17 @@ res.render('contact', {
             else{
               ResultObject = {
                 Errors : true,
-              }
+                Input:body.tx.addresses[0],
+                Output:body.tx.addresses[1], 
+                ForcedValue:forcedvalue,
+                Value:body.tx.total, 
+                ForcedFee:forcedfee,
+                ActualFee:body.tx.fees,
+                Size:body.tx.size,
+                Hash : body.tx.hash,      
+                ActualTime : moment().format('llll'),
+                Preference:body.tx.preference
+                };
               callback(ResultObject);
             }
         });
@@ -545,12 +661,29 @@ res.render('contact', {
       getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation);
   });
 
-router.get('/unconfirmed', function (req, res) {
-  res.render('unconfirmed', { //do the page 
-    title: 'Contact', 
-    message: '555-555-5555', 
-    name: pjson.name 
-})
+router.get('/TextToken', function (req, res) {
+  if (req.headers.token==undefined){
+    res.send({error : 1,
+              message : 'Error with header information'});
+  }
+  pool.query('SELECT DynamicAddress,MontoDash FROM paymentlog WHERE TextToken = '+req.headers.token+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
+    if (rows == undefined){
+      res.send({error : 2,
+        message : 'Error while performing Query'});
+    }
+    if (rows.length == 0)
+    {
+      res.send({error : 3,
+        message : 'Token not found'});
+    }
+    else
+    {
+      res.send({error : 0,
+        message : '',
+        DynamicAddress : rows[0].DynamicAddress,
+        MontoDash : rows[0].MontoDash});
+    }
+  });
 });
 
 /*router.get('/:id', function (req, res) {

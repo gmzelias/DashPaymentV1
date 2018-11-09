@@ -34,7 +34,9 @@ block content
                             #pr_a(hidden='') #{data.privateAddress}
                             #pu_a(hidden='') #{data.publicAddress}
                             #add_rr(hidden='') #{data.Address}
-                            #eid(hidden='') #{data.RPQ}
+                            #Eid(hidden='') #{data.RPQ}
+                            #Mbs(hidden='') #{data.Mbs}
+                            #Cnt(hidden='') #{data.Cnt}
                             p.cost Precio: #{data.Amount} Dash
                             p.costBs #{data.AmountBsS} BsS
                             p.itemdesc #{data.InvoiceID}
@@ -46,7 +48,8 @@ block content
                                         input#HexAddr(type='text', value=`${data.SimpleAddress}`,readonly) 
                             #dashText          
                                 p.dashTextUp     
-                                p.dashTextDown   
+                                //p.dashTextDown
+                                p.TextToken Compra #{data.TextToken}
                             #dashHelp          
                                 p.dashHelpUp     
                                 p.dashHelpDown 

@@ -25,6 +25,7 @@
     "moment": "^2.22.2",
     "mysql": "^2.16.0",
     "pug": "^2.0.3",
+    "random-number": "0.0.9",
     "request": "^2.88.0",
     "shelljs": "^0.8.2",
     "simple-encryptor": "^2.0.0",

@@ -5,6 +5,7 @@ function checkTx(/*callback*/){
         clearInterval(clocktimer);
     }
 
+    /*
     
     //FOR TESTING PURPOSE ONLY
     clearInterval(refreshIntervalId);
@@ -49,9 +50,9 @@ function checkTx(/*callback*/){
         },
     });
 
-
+*/
     
- /*console.log('entra en checkTX');
+ console.log('entra en checkTX');
   var address= $('#HexAddr').val();
   console.log(address);
   
@@ -78,7 +79,9 @@ function checkTx(/*callback*/){
                             prAddress: $('#pr_a').text(),
                             puAddress: $('#pu_a').text(),
                             Address: $('#add_rr').text(),
-                            eid: $('#eid').text()
+                            Eid: $('#Eid').text(),
+                            Mbs: $('#Mbs').text(),
+                            Cnt: $('#Cnt').text()
                         };
                         o = addressUN.length;
                         i =  body.length;   
@@ -100,7 +103,8 @@ function checkTx(/*callback*/){
                               $('#HexButton').remove();
                               $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Success"/></div>')
                               $('.dashTextUp').remove();
-                              $('.dashTextDown').remove();
+                              //$('.dashTextDown').remove();
+                              $('.TextToken').remove();
                               $('#dashText').append('<div class ="bigEntrance"><button id="submit"></button>')
                               //console.log(a);
                               //$("#timerqr").removeClass("blurmed");
@@ -111,7 +115,26 @@ function checkTx(/*callback*/){
                             },
                             error: function (e) {
                                 console.log('Error on AJAX');
-                                console.log(e);
+                                console.log('Success AJAX');
+                                //$('#middle').append(a);
+                                $('#RAddress').addClass("hideQR");
+                                $('.itemdesc').hide();
+                                $('.costBs').hide();
+                                $('.topdiv').hide();
+                                //$('#DashLoader').removeClass("ld");
+                                $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashFailed" class="ld ld-tick" /></div>')
+                                $('#HexButton').remove();
+                                $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>')
+                                $('.dashTextUp').remove();
+                                //$('.dashTextDown').remove();
+                                $('.TextToken').remove();
+                                $('#dashText').append('<div class ="bigEntrance"><button id="submitfail"></button>')
+                                //console.log(a);
+                                //$("#timerqr").removeClass("blurmed");
+                                //window.location.href="http://localhost:3000/contact";
+                                setTimeout(function () {
+                                  $('#DashFailed').removeClass("ld");
+                                  }, 2000); 
                             },
                         });
                     }
@@ -125,7 +148,7 @@ function checkTx(/*callback*/){
           else{
             alert("Confirmation Error (API)");
           }
-      });*/
+      });
 };
 
 

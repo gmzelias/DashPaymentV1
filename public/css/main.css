@@ -213,6 +213,17 @@ p.customfont {
     width: 180px;
     height: 63px;
 }
+#submitfail {
+    background-image: url( '/img/submit.png' ); 
+    background-repeat: no-repeat;
+    border:none;
+    margin-top:15px;
+    padding-right: 0px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 180px;
+    height: 63px;
+}
 #Success{
     width: 400px;
     height: 40px;
@@ -227,6 +238,21 @@ p.customfont {
     animation-duration:1.0;
     content:url('/img/check.png');
 }
+#DashFailed{
+    width:250px;
+    height:250px;
+    animation-duration:1.0;
+    content:url('/img/failed.png');
+}
+#Fail{
+    width: 400px;
+    height: 40px;
+    animation-duration:1.0s;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    content:url('/img/fail.png');
+}
+
 .totalmain{
     zoom:0.75;
 }
@@ -268,3 +294,11 @@ p.customfont {
 .body{
     background:#0066b3;
  }
+
+ .TextToken{
+ font-size: large;
+ color:#656565;
+ font-family: Latobold;
+ width: 400px;
+ background:none;
+}
