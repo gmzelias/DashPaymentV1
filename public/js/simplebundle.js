@@ -70505,7 +70505,7 @@ if (mSecondsSuccess % 10000 == 0 ){
 }*/
 checkTx();//ActivateTX
 }
-var refreshIntervalId = setInterval(rex,5000);
+var refreshIntervalId = setInterval(rex,10000);
 refreshIntervalId;
 
 },{"request":296}]},{},[354]);
