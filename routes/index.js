@@ -58,9 +58,6 @@ console.log('no existe')
 else{
   console.log(rows.RowDataPacket);
 }*/
-
-
-
   function getRate(callback){
     RateInfo = {
       error:0,
@@ -96,7 +93,7 @@ function Render(RateInfo){
  // console.log(DataToRender);
   res.render('index',DataToRender);
 };
-getRate(Render);
+  getRate(Render);
 });
 
 
@@ -110,6 +107,7 @@ getRate(Render);
 //Submit Button or Main page of payment processor.
 router.get('/submit', function (req, res, next) {
 //console.log(req.headers); //Show headers on console.
+
 if (req.headers.idestablecimiento == undefined || req.headers.monto==undefined || req.headers.contrato==undefined || eval("process.env."+req.headers.idestablecimiento)==undefined){
   var data = {
     validated:"headers"// Error with currency
@@ -206,7 +204,7 @@ if (BsRate.error==0){
     }
 
     };
-    // ------------------------------------------------------Insert data in DB
+    // ------------------------------------------------------------Insert data in DB
    function runQuery(data,callback) {
     console.log('3'); 
     var rn1= rn.generator({
@@ -292,7 +290,39 @@ if (BsRate.error==0){
   }
 }
  //------------------------------Start!
-getRate(AssignBs);
+ pool.query('SELECT ID FROM paymentlog WHERE Contrato = '+req.headers.contrato+'', function(err, rows, fields) {
+  console.log(rows);
+  console.log("primer select");
+  if (rows == undefined){
+    console.log("entra en undefined ");
+    res.send({error : 2,
+      message : 'Error while performing Query'});
+  }
+  console.log(rows.length);
+  if (rows.length != 0)
+  {
+    pool.query('SELECT * FROM txinfo WHERE FK_PaymentId = '+rows[0].ID+'', function(err, rows, fields) {
+      if (rows == undefined){
+        res.send({error : 2,
+          message : 'Error while performing Query'});
+      }
+      if (rows.length != 0){
+        res.send({
+          MontoDash: rows[0].MontoDash,
+          Hash: rows[0].Hash,
+          Status : rows[0].Status,
+          TimeStamp: rows[0].DateCompleted });
+      }
+      else{
+        getRate(AssignBs);
+      }
+    });
+  }else{
+    getRate(AssignBs);
+  } 
+});
+
+//getRate(AssignBs); Uncomment to test
 });
 
 
