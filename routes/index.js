@@ -51,7 +51,7 @@ var TxPool      =    mysql.createPool({
 
 
 //Front Page
-router.get('/', function (req, res) {
+router.get('/submit', function (req, res) {
 /*if (rows.RowDataPacket === undefined){
 console.log('no existe')
 }
@@ -91,7 +91,7 @@ function Render(RateInfo){
   }
   DataToRender.rate = Math.round(DataToRender.rate * 100) / 100
  // console.log(DataToRender);
-  res.render('index',DataToRender);
+  res.render('submit',DataToRender);
 };
   getRate(Render);
 });
@@ -105,14 +105,14 @@ function Render(RateInfo){
 
 
 //Submit Button or Main page of payment processor.
-router.get('/submit', function (req, res, next) {
+router.get('/', function (req, res, next) {
 //console.log(req.headers); //Show headers on console.
 
 if (req.headers.idestablecimiento == undefined || req.headers.monto==undefined || req.headers.contrato==undefined || eval("process.env."+req.headers.idestablecimiento)==undefined){
   var data = {
     validated:"headers"// Error with currency
   }
-  res.render('submit', {data});
+  res.render('index', {data});
   return;
 }
 //-------------------------------------------------------------------------Get BsS rate
@@ -193,14 +193,14 @@ if (BsRate.error==0){
      {
       console.log('Error with address');
        data.validated = "address";
-       res.render('submit', {data});
+       res.render('index', {data});
       }
     }else{
       var data = {
         validated:"address",
       }
       console.log('Error with address');
-      res.render('submit', {data});
+      res.render('index', {data});
     }
 
     };
@@ -257,7 +257,7 @@ if (BsRate.error==0){
    data.Mbs = Mbs;
    data.Cnt = Cnt;
    data.TextToken = data.TextToken;
-   res.render('submit', {data});
+   res.render('index', {data});
   };
 
   getInformation(setInformation);
@@ -286,11 +286,12 @@ if (BsRate.error==0){
     var data = {
       validated:"currency"// Error with currency
     }
-    res.render('submit', {data});
+    res.render('index', {data});
   }
 }
  //------------------------------Start!
- pool.query('SELECT ID FROM paymentlog WHERE Contrato = '+req.headers.contrato+'', function(err, rows, fields) {
+
+ /*pool.query('SELECT ID FROM paymentlog WHERE Contrato = '+req.headers.contrato+'', function(err, rows, fields) {
   console.log(rows);
   console.log("primer select");
   if (rows == undefined){
@@ -320,28 +321,27 @@ if (BsRate.error==0){
   }else{
     getRate(AssignBs);
   } 
-});
-
-//getRate(AssignBs); Uncomment to test
-});
-
-
-router.post('/contact', function (req, res) {
-//ONLY FOR TESTING PURPOSE
-//------------------------------------------------
-/*
-res.render('contact', {
-  Errors : 0,
-  Hash:"c1539050b6dc20e40844edaa9ea535bc76ce093471de449289fbf490cc281dfb",
-  DateCompleted:'Tue, Nov 6, 2018 7:52 PM',
-  ValueDash:0.00001710},
- function(err, html) {
-  res.send({MontoDash: 0.00001710,
-  Hash: "c1539050b6dc20e40844edaa9ea535bc76ce093471de449289fbf490cc281dfb",
-  Status : "Completed",
-  TimeStamp: 'Tue, Nov 6, 2018 7:52 PM' });
 });*/
 
+getRate(AssignBs);     //Uncomment to test
+});
+
+router.post('/timeup', function (req, res) {
+  var Eid = encryptor.decrypt(req.body.Eid);
+  var Mbs = encryptor.decrypt(req.body.Mbs);
+  var Cnt = encryptor.decrypt(req.body.Cnt);
+  var adrdecrypted = encryptor.decrypt(req.body.Address)
+    console.log(Eid);
+    console.log(Mbs);
+    console.log(Cnt);
+    console.log(adrdecrypted);
+
+});
+
+
+router.post('/action', function (req, res) {
+
+  //continue -- select, update 
   //-------------------------------------Merchants ID
   var Eid = encryptor.decrypt(req.body.Eid);
   var Mbs = encryptor.decrypt(req.body.Mbs);
@@ -466,7 +466,7 @@ res.render('contact', {
                     }
                /*  runLog(LogData,logResponse);*/
                  runTx(TxData,logResponse);
-                 res.render('contact', {
+                 res.render('action', {
                   Errors : 0,
                   Hash:BigSigned.Hash,
                   DateCompleted:BigSigned.ActualTime,
@@ -489,7 +489,7 @@ res.render('contact', {
                     Date: BigSigned.ActualTime
                   }
                   runTx(TxData,logResponse);
-                  res.render('contact', {
+                  res.render('action', {
                     Errors : 1,
                     Hash:BigSigned.Hash,
                     DateCompleted:BigSigned.ActualTime,
@@ -518,7 +518,7 @@ res.render('contact', {
                     Date: BigSigned.ActualTime
                   }
                   runTx(TxData,logResponse);
-              res.render('contact',{
+              res.render('action',{
                 Errors : 1,
                 Hash:BigSigned.Hash,
                 DateCompleted:BigSigned.ActualTime,

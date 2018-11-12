@@ -3,10 +3,48 @@ function checkTx(/*callback*/){
     if ($('#time').text()=="00:01"){
         clearInterval(refreshIntervalId);
         clearInterval(clocktimer);
-    }
+        $('#RAddress').addClass("blurmed");
+        var data = {
+            prAddress: $('#pr_a').text(),
+            puAddress: $('#pu_a').text(),
+            Address: $('#add_rr').text(),
+            Eid: $('#Eid').text(),
+            Mbs: $('#Mbs').text(),
+            Cnt: $('#Cnt').text()
+        };
+        $.ajax({
+            type: "POST",
+            url: "/timeup",
+            data: data,
+            success: function(a) {        
+                console.log('Success AJAX');
+                //$('#middle').append(a);
+                $('#RAddress').addClass("hideQR");
+                $('.itemdesc').hide();
+                $('.costBs').hide();
+                $('.topdiv').hide();
+                //$('#DashLoader').removeClass("ld");
+                $('#QR').addClass("actionlogo");
+                $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashFailed" class="ld ld-tick" /></div>')
+                $('#HexButton').remove();
+                $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>')
+                $('.dashTextUp').remove();
+                //$('.dashTextDown').remove();
+                $('.TextToken').remove();
+            // $('#dashText').append('<div class ="bigEntrance"><button id="submitfail"></button>')
+                //console.log(a);
+                //$("#timerqr").removeClass("blurmed");
+                //window.location.href="http://localhost:3000/action";
+                setTimeout(function () {
+                $('#DashFailed').removeClass("ld");
+                }, 2000); 
+            },
+            error: function (e) {
 
-    /*
-    
+            },
+        });
+    }
+/*
     //FOR TESTING PURPOSE ONLY
     clearInterval(refreshIntervalId);
     clearInterval(clocktimer);
@@ -20,38 +58,61 @@ function checkTx(/*callback*/){
     };
     $.ajax({
         type: "POST",
-        url: "/contact",
+        url: "/action", //change to non existing address to test error
         data: data,
         success: function(a) {        
-          //clock.stop();                     
-          console.log('Success AJAX');
-          //$('#middle').append(a);
-          $('#RAddress').addClass("hideQR");
-          $('.itemdesc').hide();
-          $('.costBs').hide();
-          $('.topdiv').hide();
-          //$('#DashLoader').removeClass("ld");
-          $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashCompleted" class="ld ld-tick" /></div>')
-          $('#HexButton').remove();
-          $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Success"/></div>')
-          $('.dashTextUp').remove();
-          $('.dashTextDown').remove();
-          $('#dashText').append('<div class ="bigEntrance"><button id="submit"></button>')
-          //console.log(a);
-          //$("#timerqr").removeClass("blurmed");
-          //window.location.href="http://localhost:3000/contact";
-          setTimeout(function () {
-            $('#DashCompleted').removeClass("ld");
-            }, 2000); 
-        },
+      //clock.stop();                     
+      console.log('Success AJAX');
+      //$('#middle').append(a);
+      $('#RAddress').addClass("hideQR");
+      $('.itemdesc').hide();
+      $('.costBs').hide();
+      $('.topdiv').hide();
+      //$('#DashLoader').removeClass("ld");
+      $('#QR').addClass("actionlogo");
+      $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashCompleted" class="ld ld-tick" /></div>');
+      $('#HexButton').remove();
+     // $('#submit').remove();
+      $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Success"/></div>');
+      $('.dashTextUp').remove();
+      //$('.dashTextDown').remove();
+      $('.TextToken').remove();
+      //$('#dashText').append('<div class ="bigEntrance"><button id="submit"></button>')
+      //console.log(a);
+      //$("#timerqr").removeClass("blurmed");
+      //window.location.href="http://localhost:3000/action";
+      setTimeout(function () {
+        $('#DashCompleted').removeClass("ld");
+        }, 2000); 
+    },
         error: function (e) {
             console.log('Error on AJAX');
-            console.log(e);
+            console.log('Success AJAX');
+            //$('#middle').append(a);
+            $('#RAddress').addClass("hideQR");
+            $('.itemdesc').hide();
+            $('.costBs').hide();
+            $('.topdiv').hide();
+            //$('#DashLoader').removeClass("ld");
+            $('#QR').addClass("actionlogo");
+            $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashFailed" class="ld ld-tick" /></div>')
+            $('#HexButton').remove();
+            $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>')
+            $('.dashTextUp').remove();
+            //$('.dashTextDown').remove();
+            $('.TextToken').remove();
+           // $('#dashText').append('<div class ="bigEntrance"><button id="submitfail"></button>')
+            //console.log(a);
+            //$("#timerqr").removeClass("blurmed");
+            //window.location.href="http://localhost:3000/action";
+            setTimeout(function () {
+              $('#DashFailed').removeClass("ld");
+              }, 2000); 
         },
     });
 
 */
-    
+  
  console.log('entra en checkTX');
   var address= $('#HexAddr').val();
   console.log(address);
@@ -88,31 +149,33 @@ function checkTx(/*callback*/){
                         mSecondsSuccess = 1;
                         $.ajax({
                             type: "POST",
-                            url: "/contact",
+                            url: "/action",
                             data: data,
                             success: function(a) {        
-                              //clock.stop();                     
-                              console.log('Success AJAX');
-                              //$('#middle').append(a);
-                              $('#RAddress').addClass("hideQR");
-                              $('.itemdesc').hide();
-                              $('.costBs').hide();
-                              $('.topdiv').hide();
-                              //$('#DashLoader').removeClass("ld");
-                              $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashCompleted" class="ld ld-tick" /></div>')
-                              $('#HexButton').remove();
-                              $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Success"/></div>')
-                              $('.dashTextUp').remove();
-                              //$('.dashTextDown').remove();
-                              $('.TextToken').remove();
-                              $('#dashText').append('<div class ="bigEntrance"><button id="submit"></button>')
-                              //console.log(a);
-                              //$("#timerqr").removeClass("blurmed");
-                              //window.location.href="http://localhost:3000/contact";
-                              setTimeout(function () {
-                                $('#DashCompleted').removeClass("ld");
-                                }, 2000); 
-                            },
+                                 //clock.stop();                     
+                        console.log('Success AJAX');
+                        //$('#middle').append(a);
+                        $('#RAddress').addClass("hideQR");
+                        $('.itemdesc').hide();
+                        $('.costBs').hide();
+                        $('.topdiv').hide();
+                        //$('#DashLoader').removeClass("ld");
+                        $('#QR').addClass("actionlogo");
+                        $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashCompleted" class="ld ld-tick" /></div>');
+                        $('#HexButton').remove();
+                        // $('#submit').remove();
+                        $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Success"/></div>');
+                        $('.dashTextUp').remove();
+                        //$('.dashTextDown').remove();
+                        $('.TextToken').remove();
+                        //$('#dashText').append('<div class ="bigEntrance"><button id="submit"></button>')
+                        //console.log(a);
+                        //$("#timerqr").removeClass("blurmed");
+                        //window.location.href="http://localhost:3000/action";
+                        setTimeout(function () {
+                            $('#DashCompleted').removeClass("ld");
+                            }, 2000); 
+                        },
                             error: function (e) {
                                 console.log('Error on AJAX');
                                 console.log('Success AJAX');
@@ -122,19 +185,20 @@ function checkTx(/*callback*/){
                                 $('.costBs').hide();
                                 $('.topdiv').hide();
                                 //$('#DashLoader').removeClass("ld");
+                                $('#QR').addClass("actionlogo");
                                 $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashFailed" class="ld ld-tick" /></div>')
                                 $('#HexButton').remove();
                                 $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>')
                                 $('.dashTextUp').remove();
                                 //$('.dashTextDown').remove();
                                 $('.TextToken').remove();
-                                $('#dashText').append('<div class ="bigEntrance"><button id="submitfail"></button>')
+                            // $('#dashText').append('<div class ="bigEntrance"><button id="submitfail"></button>')
                                 //console.log(a);
                                 //$("#timerqr").removeClass("blurmed");
-                                //window.location.href="http://localhost:3000/contact";
+                                //window.location.href="http://localhost:3000/action";
                                 setTimeout(function () {
-                                  $('#DashFailed').removeClass("ld");
-                                  }, 2000); 
+                                $('#DashFailed').removeClass("ld");
+                                }, 2000); 
                             },
                         });
                     }
@@ -149,8 +213,8 @@ function checkTx(/*callback*/){
             alert("Confirmation Error (API)");
           }
       });
+         
 };
-
 
 
 

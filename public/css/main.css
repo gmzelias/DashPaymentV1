@@ -2,10 +2,14 @@
     background-image: url('/img/back1.png');
     background-repeat: no-repeat;
     background-size: cover;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px; 
 }
 #mainmiddle {
     margin-top:30px;
     position: inherit;
+    padding-bottom: 10px;
 }
 div.imagelogo {
     content:url('/img/logoleft.png');
@@ -113,12 +117,11 @@ background-size: 20px 25px;
 
 #dashText,#dashHelp,#dashSupport{
     text-align: -webkit-center;
-    
 }
 
-/*#dashSupport{
-display: -webkit-inline-box;
-}*/
+#dashSupport{
+    width: 510px;
+}
 
 .dashTextUp{
     content:url('/img/dashUp.png');
@@ -137,8 +140,8 @@ display: -webkit-inline-box;
     content:url('/img/helpUp3.png');
     width: 180px;
    /* height: 20px;*/
-    margin-bottom: 0px;
-    margin-top: 30px;
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 .dashHelpDown{
     content:url( '/img/helpDown.png' );
@@ -246,7 +249,7 @@ p.customfont {
 }
 #Fail{
     width: 400px;
-    height: 40px;
+    height: 35px;
     animation-duration:1.0s;
     margin-top: 30px;
     margin-bottom: 30px;
@@ -283,9 +286,9 @@ p.customfont {
     -o-box-shadow: 0 5px 15px rgba(0,0,0,0);
     box-shadow: 0 5px 15px rgba(0,0,0,0);
     border:none;
-    -webkit-border-radius: 15px;
-    -moz-border-radius: 15px;
-    border-radius: 15px; 
+    -webkit-border-radius: 25px;
+    -moz-border-radius: 25px;
+    border-radius: 25px; 
 }
 .modal-body{
     padding: 0px;
@@ -301,4 +304,8 @@ p.customfont {
  font-family: Latobold;
  width: 400px;
  background:none;
+}
+
+.actionlogo{
+    margin-top: 40px;
 }
