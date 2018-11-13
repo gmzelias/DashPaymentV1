@@ -287,29 +287,32 @@ if (BsRate.error==0){
 }
  //------------------------------Start!
 
- pool.query('SELECT ID FROM paymentlog WHERE Contrato = '+req.headers.contrato+'', function(err, rows, fields) {
+ pool.query('SELECT * FROM paymentlog WHERE Contrato = '+req.headers.contrato+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
  // console.log("primer select");
+ //console.log("primer select:" +rows[0].ID);
   if (rows == undefined){
     res.send({error : 2,
       message : 'Error while performing Query'});
       return;
   }
+  //console.log("tamano primer select:" +rows.length);
   if (rows.length != 0)
   {
-    pool.query('SELECT * FROM txinfo WHERE FK_PaymentId = '+rows[0].ID+'', function(err, rows, fields) {
-     // console.log("segundo select");
-      if (rows == undefined){
+    //console.log("id del payment" + rows[0].ID);
+    pool.query('SELECT * FROM txinfo WHERE FK_PaymentId = '+rows[0].ID+'', function(err, rows2, fields) {
+    // console.log("rows del segundo select" +rows2);
+      if (rows2 == undefined){
         res.send({error : 2,
           message : 'Error while performing Query'});
           return;
       }
-      console.log(rows.length);
-     if (rows.length != 0){
+      //console.log(rows2.length);
+     if (rows2.length != 0){
           res.send({
-          MontoDash: rows[0].MontoDash,
-          Hash: rows[0].Hash,
-          Status : rows[0].Status,
-          TimeStamp: rows[0].DateCompleted });
+          MontoDash: rows2[0].MontoDash,
+          Hash: rows2[0].Hash,
+          Status : rows2[0].Status,
+          TimeStamp: rows2[0].DateCompleted });
           return;
       }
       else{
