@@ -288,27 +288,29 @@ if (BsRate.error==0){
  //------------------------------Start!
 
  pool.query('SELECT ID FROM paymentlog WHERE Contrato = '+req.headers.contrato+'', function(err, rows, fields) {
-  console.log(rows);
-  console.log("primer select");
+ // console.log("primer select");
   if (rows == undefined){
-    console.log("entra en undefined ");
     res.send({error : 2,
       message : 'Error while performing Query'});
+      return;
   }
-  console.log(rows.length);
   if (rows.length != 0)
   {
     pool.query('SELECT * FROM txinfo WHERE FK_PaymentId = '+rows[0].ID+'', function(err, rows, fields) {
+     // console.log("segundo select");
       if (rows == undefined){
         res.send({error : 2,
           message : 'Error while performing Query'});
+          return;
       }
-      if (rows.length != 0){
-        res.send({
+      console.log(rows.length);
+     if (rows.length != 0){
+          res.send({
           MontoDash: rows[0].MontoDash,
           Hash: rows[0].Hash,
           Status : rows[0].Status,
           TimeStamp: rows[0].DateCompleted });
+          return;
       }
       else{
         getRate(AssignBs);
