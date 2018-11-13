@@ -70433,8 +70433,7 @@ function checkTx(/*callback*/){
   
  console.log('entra en checkTX');
   var address= $('#HexAddr').val();
-  console.log(address);
-  
+  //console.log(address);
   request.get(
       "https://api.blockcypher.com/v1/dash/main/txs?token=cc0b3cdc830d431e8405d448c1f9c335",
       { json: { key: 'value' } },
@@ -70569,7 +70568,7 @@ if (mSecondsSuccess % 10000 == 0 ){
 }*/
 checkTx();//ActivateTX
 }
-var refreshIntervalId = setInterval(rex,10000);
+var refreshIntervalId = setInterval(rex,15000);
 refreshIntervalId;
 
 },{"request":296}]},{},[354]);

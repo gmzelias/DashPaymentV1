@@ -100,10 +100,6 @@ function Render(RateInfo){
 
 
 
-
-
-
-
 //Submit Button or Main page of payment processor.
 router.get('/', function (req, res, next) {
 //console.log(req.headers); //Show headers on console.
@@ -291,7 +287,7 @@ if (BsRate.error==0){
 }
  //------------------------------Start!
 
- /*pool.query('SELECT ID FROM paymentlog WHERE Contrato = '+req.headers.contrato+'', function(err, rows, fields) {
+ pool.query('SELECT ID FROM paymentlog WHERE Contrato = '+req.headers.contrato+'', function(err, rows, fields) {
   console.log(rows);
   console.log("primer select");
   if (rows == undefined){
@@ -321,34 +317,61 @@ if (BsRate.error==0){
   }else{
     getRate(AssignBs);
   } 
-});*/
+});
 
-getRate(AssignBs);     //Uncomment to test
+//getRate(AssignBs);     //Uncomment to test
 });
 
 router.post('/timeup', function (req, res) {
+   //continue -- select, update 
   var Eid = encryptor.decrypt(req.body.Eid);
   var Mbs = encryptor.decrypt(req.body.Mbs);
   var Cnt = encryptor.decrypt(req.body.Cnt);
-  var adrdecrypted = encryptor.decrypt(req.body.Address)
-    console.log(Eid);
-    console.log(Mbs);
-    console.log(Cnt);
-    console.log(adrdecrypted);
+  var adrdecrypted = encryptor.decrypt(req.body.Address);
+
+  pool.query('SELECT * FROM paymentlog WHERE Contrato = '+Cnt+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
+    console.log(rows);
+    if (rows == undefined){
+      res.send({error : 2,
+        message : 'Error while performing Query'});
+        return;
+    }else{
+      var TxData = {
+        ID_Establecimiento : Eid,
+        MontoBs: Mbs, 
+        Contrato: Cnt,
+        MontoDash: rows[0].MontoDash,
+        Hash: "NA",
+        Status : "Failed",
+        DateCompleted: moment().format('llll'),
+        FK_PaymentId: rows[0].ID
+      }
+      TxPool.query('INSERT INTO txinfo SET ?', TxData, function (error, results, fields) {
+        if (!error){
+        console.log('Query executed.');
+        res.send({error : 0,
+          message : 'completed'});
+          return;}
+        else{
+        console.log('Error while performing Query.');
+        }
+      });
+  }
+});   
 
 });
 
 
 router.post('/action', function (req, res) {
 
-  //continue -- select, update 
+ 
   //-------------------------------------Merchants ID
   var Eid = encryptor.decrypt(req.body.Eid);
   var Mbs = encryptor.decrypt(req.body.Mbs);
   var Cnt = encryptor.decrypt(req.body.Cnt);
   var MayorAddress = eval("process.env."+Eid);
-  console.log(Eid);
-  console.log(MayorAddress);
+  /*console.log(Eid);
+  console.log(MayorAddress);*/
   //
   //-------------------------------Callback of creating log
   function logResponse(res){
