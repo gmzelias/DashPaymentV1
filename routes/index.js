@@ -119,9 +119,19 @@ var options = {uri: 'https://dash.casa/api/?cur=VES',
               method: 'GET'};
 request(options, function (error, response, body) {   
   if (!error && response.statusCode == 200) {
-    var JsonBody = JSON.parse(body);
-    RateInfo.error=JsonBody.errcode;
-    RateInfo.rate=JsonBody.dashrate;
+    try{
+      console.log("entra en try");
+      var JsonBody = JSON.parse(body);
+      RateInfo.error=JsonBody.errcode;
+      RateInfo.rate=JsonBody.dashrate;
+    }
+    catch(e){
+      console.log("entra en catch");
+    //  console.log(e)
+   //   RateInfo.error=1;
+   RateInfo.error=0;
+   RateInfo.rate=43920;
+    }  
   }
  else{
    RateInfo.error=1;}
@@ -502,6 +512,7 @@ router.post('/action', function (req, res) {
                  function(err, html) {
                   res.send({MontoDash: BigSigned.Value+BigSigned.ActualFee,
                   Hash: BigSigned.Hash,
+                  Contrato: Cnt,
                   Status : "Completed",
                   TimeStamp: BigSigned.ActualTime });
                 });
@@ -526,6 +537,7 @@ router.post('/action', function (req, res) {
                     res.send({MontoDash: BigSigned.Value+BigSigned.ActualFee,
                     Hash: BigSigned.Hash,
                     Status : "Failed",
+                    Contrato: Cnt,
                     TimeStamp: BigSigned.ActualTime });
                   });
                   console.log('Error signing tx');
@@ -543,6 +555,7 @@ router.post('/action', function (req, res) {
                     MontoDash: Big.ForcedValue+Big.ForcedFee,
                     Hash: BigSigned.Hash,
                     Status : "Failed",
+                    Contrato: Cnt,
                     Date: BigSigned.ActualTime
                   }
                   runTx(TxData,logResponse);
