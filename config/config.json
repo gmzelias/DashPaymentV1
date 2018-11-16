@@ -10,5 +10,11 @@
         "PORT":3000,
         "JWT_SECRET":"asdwwqkjri2u3439urjrcp230.dgsrt",
         "gmz8": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q"                    
+    },
+
+    "production":{
+        "PORT":3000,
+        "JWT_SECRET":"asdwwqkjri2u3439urjrcp230.dgsrt",
+        "gmz8": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q"                    
     }
 }
