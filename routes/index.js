@@ -553,7 +553,7 @@ router.post('/action', function (req, res) {
                     MontoBs: Mbs, 
                     Contrato: Cnt,
                     MontoDash: Big.ForcedValue+Big.ForcedFee,
-                    Hash: BigSigned.Hash,
+                    Hash: "",
                     Status : "Failed",
                     Contrato: Cnt,
                     Date: BigSigned.ActualTime
