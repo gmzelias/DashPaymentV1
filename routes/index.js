@@ -449,7 +449,7 @@ router.post('/action', function (req, res) {
   var address = req.body.address;
   //CHECK CHECK CHECK CHECK
   var confirmation = false;
-  var times = 0;
+  //var times = 0; //Confirmation times
 
   //----------------------------------------------Checks if the first tx has been done (QR SCANNING).
   function getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation){
@@ -556,7 +556,7 @@ router.post('/action', function (req, res) {
                     Hash: "",
                     Status : "Failed",
                     Contrato: Cnt,
-                    Date: BigSigned.ActualTime
+                    Date: Big.ActualTime
                   }
                   runTx(TxData,logResponse);
               res.render('action',{
