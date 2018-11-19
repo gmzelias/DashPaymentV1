@@ -385,7 +385,7 @@ router.post('/action', function (req, res) {
   var Mbs = encryptor.decrypt(req.body.Mbs);
   var Cnt = encryptor.decrypt(req.body.Cnt);
   var MayorAddress = eval("process.env."+Eid);
-  MayorAddress = MayorAddress.replace(/['"]+/g, '')
+  MayorAddress = (MayorAddress.replace(/['"]+/g, '')).trim()
   console.log(MayorAddress);
   /*console.log(Eid);
   console.log(MayorAddress);*/
@@ -541,7 +541,7 @@ router.post('/action', function (req, res) {
                     Hash: BigSigned.Hash,
                     Status : "Failed",
                     Contrato: Cnt,
-                    TimeStamp: BigSigned.ActualTime });
+                    TimeStamp:  moment().format('llll') });
                   });
                   console.log('Error signing tx');
                     }
@@ -559,7 +559,7 @@ router.post('/action', function (req, res) {
                     Hash: "",
                     Status : "Failed",
                     Contrato: Cnt,
-                    Date: Big.ActualTime
+                    Date:moment().format('llll')
                   }
                   runTx(TxData,logResponse);
               res.statusCode =500;
