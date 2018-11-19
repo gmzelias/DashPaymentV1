@@ -70496,7 +70496,6 @@ function checkTx(/*callback*/){
                         },
                             error: function (e) {
                                 console.log('Error on AJAX');
-                                console.log('Success AJAX');
                                 //$('#middle').append(a);
                                 $('#RAddress').addClass("hideQR");
                                 $('.itemdesc').hide();
