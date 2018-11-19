@@ -561,8 +561,8 @@ router.post('/action', function (req, res) {
                   runTx(TxData,logResponse);
               res.render('action',{
                 Errors : 1,
-                Hash:BigSigned.Hash,
-                DateCompleted:BigSigned.ActualTime,
+                Hash:Big.Hash,
+                DateCompleted:Big.ActualTime,
                 ValueDash:Big.ForcedValue+Big.ForcedFee,
               });       
                 }
