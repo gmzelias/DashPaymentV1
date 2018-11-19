@@ -177,7 +177,7 @@ function checkTx(/*callback*/){
                             }, 2000); 
                         },
                             error: function (e) {
-                                console.log('Error on AJAX');
+                                console.log('Error AJAX');
                                 //$('#middle').append(a);
                                 $('#RAddress').addClass("hideQR");
                                 $('.itemdesc').hide();

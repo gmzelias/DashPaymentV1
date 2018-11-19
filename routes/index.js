@@ -528,6 +528,7 @@ router.post('/action', function (req, res) {
                     Date: BigSigned.ActualTime
                   }
                   runTx(TxData,logResponse);
+                  res.statusCode =500;
                   res.render('action', {
                     Errors : 1,
                     Hash:BigSigned.Hash,
@@ -559,6 +560,7 @@ router.post('/action', function (req, res) {
                     Date: Big.ActualTime
                   }
                   runTx(TxData,logResponse);
+              res.statusCode =500;
               res.render('action',{
                 Errors : 1,
                 Hash:Big.Hash,
