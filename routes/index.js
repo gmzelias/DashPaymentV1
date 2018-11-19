@@ -385,6 +385,8 @@ router.post('/action', function (req, res) {
   var Mbs = encryptor.decrypt(req.body.Mbs);
   var Cnt = encryptor.decrypt(req.body.Cnt);
   var MayorAddress = eval("process.env."+Eid);
+  MayorAddress = MayorAddress.replace(/['"]+/g, '')
+  console.log(MayorAddress);
   /*console.log(Eid);
   console.log(MayorAddress);*/
   //
