@@ -31,19 +31,19 @@ var TxPool      =    mysql.createPool({
 });*/
 var pool      =    mysql.createPool({
   connectionLimit : 100, //important
-  host     : 'us-cdbr-iron-east-01.cleardb.net',
-  user     : 'bd41ebdff45aba',
-  password : '784c92dc',
-  database : 'heroku_6919a10d77210f6',
+  host     : 'dashdatabases.cr5ve2k1u2yt.us-east-1.rds.amazonaws.com',
+  user     : 'dashadmin',
+  password : 'dashmaster8766',
+  database : 'PaymentProcessor',
   debug    :  false
 });
 
 var TxPool      =    mysql.createPool({
   connectionLimit : 100, //important
-  host     : 'us-cdbr-iron-east-01.cleardb.net',
-  user     : 'bd41ebdff45aba',
-  password : '784c92dc',
-  database : 'heroku_6919a10d77210f6',
+  host     : 'dashdatabases.cr5ve2k1u2yt.us-east-1.rds.amazonaws.com',
+  user     : 'dashadmin',
+  password : 'dashmaster8766',
+  database : 'PaymentProcessor',
   debug    :  false
 });
 
@@ -319,6 +319,7 @@ if (BsRate.error==0){
       //console.log(rows2.length);
      if (rows2.length != 0){
           res.send({
+          Contrato: rows2[0].Contrato,
           MontoDash: rows2[0].MontoDash,
           Hash: rows2[0].Hash,
           Status : rows2[0].Status,
