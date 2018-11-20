@@ -31,19 +31,19 @@ var TxPool      =    mysql.createPool({
 });*/
 var pool      =    mysql.createPool({
   connectionLimit : 100, //important
-  host     : 'dashdatabases.cr5ve2k1u2yt.us-east-1.rds.amazonaws.com',
+  host     : 'dashdatabase.cshqrg6tymlg.us-west-2.rds.amazonaws.com',
   user     : 'dashadmin',
   password : 'dashmaster8766',
-  database : 'PaymentProcessor',
+  database : 'dashadmin',
   debug    :  false
 });
 
 var TxPool      =    mysql.createPool({
   connectionLimit : 100, //important
-  host     : 'dashdatabases.cr5ve2k1u2yt.us-east-1.rds.amazonaws.com',
+  host     : 'dashdatabase.cshqrg6tymlg.us-west-2.rds.amazonaws.com',
   user     : 'dashadmin',
   password : 'dashmaster8766',
-  database : 'PaymentProcessor',
+  database : 'dashadmin',
   debug    :  false
 });
 
