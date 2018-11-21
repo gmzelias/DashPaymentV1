@@ -424,12 +424,13 @@ router.post('/action', function (req, res) {
     function runTx(data,callback) {
       //altertable
       pool.query('SELECT ID, TextToken FROM paymentlog WHERE Contrato = '+data.Contrato+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
-          var FK_PaymentId = rows[0].ID;
+          data.FK_PaymentId = rows[0].ID;
           var TextToken = rows[0].TextToken;
           pool.query('UPDATE paymentlog SET TextTokenStatus = false WHERE  TextToken = '+TextToken+'');   
-          data.FK_PaymentId = FK_PaymentId;
+          console.log("1er select");
       });   
       TxPool.query('INSERT INTO txinfo SET ?', data, function (error, results, fields) {
+        console.log("2do select o insert");
         if (!error){
         console.log('Query executed.');
         data.validated = true;
