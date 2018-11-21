@@ -308,9 +308,14 @@ if (BsRate.error==0){
   //console.log("tamano primer select:" +rows.length);
   if (rows.length != 0)
   {
+    var Payment = rows[0].ID;
+    var Merchant = req.headers.idestablecimiento;
+    var SQL = 'SELECT * FROM txinfo WHERE FK_PaymentId = ? AND ID_Establecimiento = ?';
     //console.log("id del payment" + rows[0].ID);
-    pool.query('SELECT * FROM txinfo WHERE FK_PaymentId = '+rows[0].ID+'', function(err, rows2, fields) {
-    // console.log("rows del segundo select" +rows2);
+    /*console.log(req.headers.idestablecimiento);
+    console.log(rows[0].ID);*/
+    pool.query(SQL, [Payment, Merchant], function(err, rows2, fields) {
+    //console.log("rows del segundo select " +rows2);
       if (rows2 == undefined){
         res.send({error : 2,
           message : 'Error while performing Query'});
