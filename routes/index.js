@@ -428,20 +428,20 @@ router.post('/action', function (req, res) {
           var TextToken = rows[0].TextToken;
           pool.query('UPDATE paymentlog SET TextTokenStatus = false WHERE  TextToken = '+TextToken+'');   
           console.log("1er select");
+          TxPool.query('INSERT INTO txinfo SET ?', data, function (error, results, fields) {
+            console.log("2do select o insert");
+            if (!error){
+            console.log('Query executed.');
+            data.validated = true;
+            }
+            else{
+            console.log(error);
+            console.log('Error while performing Query.');
+            data.validated = false;
+            }
+            callback(data);
+          });
       });   
-      TxPool.query('INSERT INTO txinfo SET ?', data, function (error, results, fields) {
-        console.log("2do select o insert");
-        if (!error){
-        console.log('Query executed.');
-        data.validated = true;
-        }
-        else{
-        console.log(error);
-        console.log('Error while performing Query.');
-        data.validated = false;
-        }
-        callback(data);
-      });
     }
     /*
     data.validated = true;
