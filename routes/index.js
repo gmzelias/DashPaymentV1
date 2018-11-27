@@ -329,6 +329,19 @@ router.post('/timeup', function (req, res) {
       pool.query('INSERT INTO txinfo SET ?', TxData, function (error, results, fields) {
         if (!error){
         console.log('Query executed.');
+        
+        //------------------Send Tx info to merchant's URL.
+        const options = {  
+          url: 'http://localhost:3000/testresponse',
+          body:JSON.stringify({TxData}),    
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+        }      
+      };
+        request(options, function(err, output, body) {});
+      //---------------------------------------------------
+
         res.send({error : 0,
           message : 'completed'});
           return;}
@@ -338,9 +351,12 @@ router.post('/timeup', function (req, res) {
       });
   }
 });   
-
 });
 
+
+router.post('/testresponse', function (req, res) {
+console.log(req.body);
+});
 //---------------------------------------------------------Route to be executed when the Tx is dicovered in the Blockchain.
 router.post('/action', function (req, res) {
   //-------------------------------------Merchants ID

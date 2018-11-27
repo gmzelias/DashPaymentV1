@@ -124,11 +124,14 @@ background-size: 20px 25px;
 }
 
 .dashTextUp{
-    content:url('/img/dashUp.png');
-    width: 250px;
-    height: 20px;
+    content:url('/img/DTT.png');
+    width: 150px;
+    height: 40px;
     margin-top: 10px;
     margin-bottom: 0px;
+}
+.SubDashText{
+    display: inline-flex;
 }
 .dashTextDown{
     content:url( '/img/dashDown.png' );
@@ -299,12 +302,21 @@ p.customfont {
  }
 
  .TextToken{
- font-size: large;
+ font-size: x-large;
  color:#656565;
  font-family: Latobold;
  width: 400px;
  background:none;
 }
+.PrevTextToken{
+    font-size: x-large;
+    color:#656565;
+    font-family: Latobold;
+    background:none;
+    margin-bottom: 0px;
+    margin-top: 9px;
+    margin-right: 7px;
+   }
 
 .actionlogo{
     margin-top: 40px;
