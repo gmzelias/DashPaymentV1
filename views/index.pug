@@ -63,6 +63,9 @@ block content
                             //script(src='js/time.js')
                             script(type='text/javascript').
                                 $('<img src="/img/failed.png"/>');
+                                $('<img src="/img/check.png"/>');
+                                $('<img src="/img/success.png"/>');
+                                $('<img src="/img/fail.png"/>');
                                 $('#exampleModal').modal('show');
                                 startTimer(1 * 60, $('#time'));
                                 new QRCode(document.getElementById("RAddress"), "#{data.RAddress}");                      

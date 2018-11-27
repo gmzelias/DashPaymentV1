@@ -27,7 +27,8 @@ function checkTx(/*callback*/){
                 $('#QR').addClass("actionlogo");
                 $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashFailed" class="ld ld-tick" /></div>')
                 $('#HexButton').remove();
-                $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>')
+                $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>');
+                $('.SubDashText').remove();
                 $('.dashTextUp').remove();
                 //$('.dashTextDown').remove();
                 $('.TextToken').remove();
@@ -165,6 +166,7 @@ function checkTx(/*callback*/){
                         $('#HexButton').remove();
                         // $('#submit').remove();
                         $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Success"/></div>');
+                        $('.SubDashText').remove();
                         $('.dashTextUp').remove();
                         //$('.dashTextDown').remove();
                         $('.TextToken').remove();
@@ -187,7 +189,8 @@ function checkTx(/*callback*/){
                                 $('#QR').addClass("actionlogo");
                                 $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashFailed" class="ld ld-tick" /></div>')
                                 $('#HexButton').remove();
-                                $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>')
+                                $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>');
+                                $('.SubDashText').remove();
                                 $('.dashTextUp').remove();
                                 //$('.dashTextDown').remove();
                                 $('.TextToken').remove();
