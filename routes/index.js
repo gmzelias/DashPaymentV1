@@ -673,7 +673,7 @@ router.get('/TextToken', function (req, res) {
               message : 'Error with header information'});
     return;
   }
-  pool.query('SELECT DynamicAddress,MontoDash FROM paymentlog WHERE TextToken = '+req.headers.token+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
+  pool.query('SELECT DynamicAddress,MontoDash, MontoBs FROM paymentlog WHERE TextToken = '+req.headers.token+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
     if (rows == undefined){
       res.send({error : 2,
         message : 'Error while performing Query'});
@@ -690,6 +690,7 @@ router.get('/TextToken', function (req, res) {
       res.send({error : 0,
         message : '',
         DynamicAddress : rows[0].DynamicAddress,
+        MontoBsS: rows[0].MontoBs,
         MontoDash : rows[0].MontoDash});
         return;
     }
