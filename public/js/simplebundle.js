@@ -70318,7 +70318,8 @@ WError.prototype.cause = function we_cause(c)
 },{"assert-plus":236,"core-util-is":245,"extsprintf":251,"util":186}],354:[function(require,module,exports){
 var request = require('request');
 function checkTx(/*callback*/){
-    if ($('#time').text()=="00:01" || $('#time').text()=="00:00"){
+    if ($('#time').text()=== "00:00" || ms === 60000){ // 60000 ms a minute
+        $('#time').text("00:00");
         clearInterval(refreshIntervalId);
         clearInterval(clocktimer);
         $('#RAddress').addClass("blurmed");
@@ -70345,7 +70346,8 @@ function checkTx(/*callback*/){
                 $('#QR').addClass("actionlogo");
                 $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashFailed" class="ld ld-tick" /></div>')
                 $('#HexButton').remove();
-                $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>')
+                $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>');
+                $('.SubDashText').remove();
                 $('.dashTextUp').remove();
                 //$('.dashTextDown').remove();
                 $('.TextToken').remove();
@@ -70483,6 +70485,7 @@ function checkTx(/*callback*/){
                         $('#HexButton').remove();
                         // $('#submit').remove();
                         $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Success"/></div>');
+                        $('.SubDashText').remove();
                         $('.dashTextUp').remove();
                         //$('.dashTextDown').remove();
                         $('.TextToken').remove();
@@ -70505,7 +70508,8 @@ function checkTx(/*callback*/){
                                 $('#QR').addClass("actionlogo");
                                 $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashFailed" class="ld ld-tick" /></div>')
                                 $('#HexButton').remove();
-                                $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>')
+                                $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>');
+                                $('.SubDashText').remove();
                                 $('.dashTextUp').remove();
                                 //$('.dashTextDown').remove();
                                 $('.TextToken').remove();
@@ -70558,6 +70562,7 @@ function checkTx(/*callback*/){
 /*var mSeconds = 60000;
 var mSecondsSuccess = mSeconds;/*==*/
 function rex(){
+ms = ms + 10000;
 checkTx();//ActivateTX
 
 // Code used for loading bar
@@ -70572,6 +70577,7 @@ if (mSecondsSuccess % 10000 == 0 ){
 }*/
 
 }
+var ms = 0;
 var refreshIntervalId = setInterval(rex,10000); // Set here the secs to check for the Tx.
 refreshIntervalId;
 

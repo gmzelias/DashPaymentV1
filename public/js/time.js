@@ -1,6 +1,7 @@
 var request = require('request');
 function checkTx(/*callback*/){
-    if ($('#time').text()=="00:01" || $('#time').text()=="00:00"){
+    if ($('#time').text()=== "00:00" || ms === 60000){ // 60000 ms a minute
+        $('#time').text("00:00");
         clearInterval(refreshIntervalId);
         clearInterval(clocktimer);
         $('#RAddress').addClass("blurmed");
@@ -243,6 +244,7 @@ function checkTx(/*callback*/){
 /*var mSeconds = 60000;
 var mSecondsSuccess = mSeconds;/*==*/
 function rex(){
+ms = ms + 10000;
 checkTx();//ActivateTX
 
 // Code used for loading bar
@@ -257,5 +259,6 @@ if (mSecondsSuccess % 10000 == 0 ){
 }*/
 
 }
+var ms = 0;
 var refreshIntervalId = setInterval(rex,10000); // Set here the secs to check for the Tx.
 refreshIntervalId;
