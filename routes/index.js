@@ -67,7 +67,7 @@ function Render(RateInfo){
 //Main Page
 router.get('/', function (req, res, next) {
 //console.log(req.headers); //Show headers on console.
-// ------------------------------------------------------------Validate that headers in request are valid.
+// ------------------------------------------------------------Validate that headers in the request are valid.
 if (req.headers.idestablecimiento == undefined || req.headers.monto==undefined || req.headers.contrato==undefined || eval("process.env."+req.headers.idestablecimiento)==undefined){
   var data = {
     validated:"headers"// Error with currency
