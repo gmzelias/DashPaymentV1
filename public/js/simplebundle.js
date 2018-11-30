@@ -70318,7 +70318,7 @@ WError.prototype.cause = function we_cause(c)
 },{"assert-plus":236,"core-util-is":245,"extsprintf":251,"util":186}],354:[function(require,module,exports){
 var request = require('request');
 function checkTx(/*callback*/){
-    if ($('#time').text()=== "00:00" || ms === 60000){ // 60000 ms a minute
+    if ($('#time').text()=== "00:00" || ms === 300000){ // 60000 ms a minute
         $('#time').text("00:00");
         clearInterval(refreshIntervalId);
         clearInterval(clocktimer);
