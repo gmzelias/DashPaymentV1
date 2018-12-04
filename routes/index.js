@@ -266,6 +266,7 @@ if (BsRate.error==0){
  //-----------------------------------Validate if the contract (invoice) is not repeated in the merchant, if repeated return the Tx response.
  pool.query('SELECT * FROM paymentlog WHERE Contrato = '+req.headers.contrato+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
   if (rows == undefined){
+    console.log(err);
     res.send({error : 2,
       message : 'Error while performing Query'});
       return;
