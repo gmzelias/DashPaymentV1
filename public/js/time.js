@@ -260,5 +260,5 @@ if (mSecondsSuccess % 10000 == 0 ){
 
 }
 var ms = 0;
-var refreshIntervalId = setInterval(rex,10000); // Set here the secs to check for the Tx.
+var refreshIntervalId = setInterval(rex,5000); // Set here the secs to check for the Tx.
 refreshIntervalId;
