@@ -3,21 +3,23 @@
         "PORT":3000,
         "JWT_SECRET":"324325fsdfsfkmwofekpvsd.q30",
         "gmz8": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q",
-        "tulocompras": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q"    
-            
+        "tulocompras": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q",    
+        "giorgio": "XszfxbPK4hyo72az7CffvEkiSKkwWs3T3q"
 
     },
     "development":{
         "PORT":3000,
         "JWT_SECRET":"asdwwqkjri2u3439urjrcp230.dgsrt",
         "gmz8": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q",
-        "tulocompras": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q"                   
+        "tulocompras": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q",                   
+	"giorgio":"XszfxbPK4hyo72az7CffvEkiSKkwWs3T3q"
     },
 
     "production":{
         "PORT":3000,
         "JWT_SECRET":"asdwwqkjri2u3439urjrcp230.dgsrt",
         "gmz8": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q",
-        "tulocompras": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q"                   
+        "tulocompras": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q",
+	"giorgio": "XszfxbPK4hyo72az7CffvEkiSKkwWs3T3q"                   
     }
 }
