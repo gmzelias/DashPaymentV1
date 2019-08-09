@@ -10,6 +10,8 @@ var encryptor = require('simple-encryptor')(key);
 //const shell = require('shelljs');
 var r = require('jsrsasign');
 var rn = require('random-number');
+let merchantsCodes = require('../public/js/merchants.json');
+let transferCodeDT = '';
 
 var pool      =    mysql.createPool({
   connectionLimit : 100, //important
@@ -20,6 +22,8 @@ var pool      =    mysql.createPool({
   debug    :  false
 });
 
+
+/*                                                                        EXECUTION STARTS IN LINE 306 */
 //Front Page
 
 /*router.get('/submit', function (req, res) {
@@ -61,44 +65,99 @@ function Render(RateInfo){
   getRate(Render);
 });*/
 
-
-
+//Main Page
+router.get('/checkTxStatus', function (req, res, next) {
+  req.on('close', function (err){
+    console.log('Canceled');
+    clearInterval(refreshIntervalId);
+});
+  req.setTimeout(350000);
+  let ms = 0;
+  let refreshIntervalId = setInterval(rex,7000); 
+  if (req.headers.contrato == undefined){
+    console.log('Undefined header')
+    clearInterval(refreshIntervalId);
+    return res.status(500).send({error:'Missing information'});
+  }
+  else{// Set here the secs to check for the Tx.
+    rex();
+    refreshIntervalId;
+  }
+    function rex(){
+    console.log(ms);
+    ms = ms + 10000;
+    if (ms === 450000){ 
+      console.log('Data not found')
+      clearInterval(refreshIntervalId);
+      return res.status(500).send({error:'Data not found'});
+    }else{
+      var SQL = 'SELECT * FROM txinfo WHERE Contrato = ?';
+      pool.query(SQL, [req.headers.contrato], function(err, rows, fields) {
+        if (err){
+          console.log('Error on DB')
+          clearInterval(refreshIntervalId);
+          return res.status(500).send('Unexpected error (DB)');            
+        }
+        if (rows.length != 0)
+        {
+          let dataToSend ={
+            Contrato: rows[0].Contrato,
+            MontoDash: rows[0].MontoDash,
+            Hash: rows[0].Hash,
+            Status: rows[0].Status,
+            TimeStamp: rows[0].DateCompleted,
+          }
+          console.log('Success')
+          clearInterval(refreshIntervalId);
+          return res.status(200).json(dataToSend);      
+        }
+      });
+    }
+  }
+});
 
 //Main Page
 router.get('/', function (req, res, next) {
 //console.log(req.headers); //Show headers on console.
 // ------------------------------------------------------------Validate that headers in the request are valid.
-if (req.headers.idestablecimiento == undefined || req.headers.monto==undefined || req.headers.contrato==undefined || eval("process.env."+req.headers.idestablecimiento)==undefined){
-  var data = {
-    validated:"headers"// Error with currency
-  }
+if (req.headers.idestablecimiento == undefined || req.headers.monto==undefined || req.headers.contrato==undefined || merchantsCodes[req.headers.idestablecimiento]==undefined){
+  var data = {validated:"headers"}// Error with currency
   res.render('index', {data});
   return;
 }
+//-----------------
+//-----------------
+//-----------------
+//-----------------
 //-------------------------------------------------------------------------Function to get BsS rate
 function getRate(callback){
 RateInfo = {error:0,
             rate:0}
-var options = {uri: 'https://dash.casa/api/?cur=VES',
-              method: 'GET'};
+/*var options = {uri: 'https://dash.casa/api/?cur=VES',
+              method: 'GET'};*/
+  var options = {uri: 'http://ec2-18-237-86-164.us-west-2.compute.amazonaws.com:3000/API/dashRate?currency=Bs',
+              method: 'GET'};  
 request(options, function (error, response, body) {   
   if (!error && response.statusCode == 200) {
-    try{
-      console.log("entra en try");
+    //try{
+      console.log("try API Bs rate");
       var JsonBody = JSON.parse(body);
-      RateInfo.error=JsonBody.errcode;
-      RateInfo.rate=JsonBody.dashrate;
-    }
-    catch(e){
+      var mainBsRate = JsonBody.vesDashRate.replace(/[\[\]&(.)]+/g, '');
+      console.log(mainBsRate, 'del api nuevo');
+      mainBsRate = mainBsRate.replace(",", ".");
+      console.log(parseFloat(mainBsRate), 'del api nuevo');
+      RateInfo.error=0;
+      RateInfo.rate=parseFloat(mainBsRate);
+   // }
+   /* catch(e){
       console.log("entra en catch");
-    //  console.log(e)
-   //   RateInfo.error=1;
-   RateInfo.error=0;
-   RateInfo.rate=43920;
-    }  
+      RateInfo.error=0;
+      RateInfo.rate=43920;
+      }  */
   }
  else{
-   RateInfo.error=1;}
+   RateInfo.error=1;
+  }
    callback(RateInfo);
 });
 };
@@ -108,7 +167,7 @@ function AssignBs(RateInfo){
 var BsRate = RateInfo;
 if (BsRate.error==0){
   var rate = BsRate.rate;
-  var exchange = ((req.headers.monto) / rate)+0.00000500; // 500 Duff added as a Flat Fee
+  var exchange = ((req.headers.monto) / rate)+0.00000300; // 500 Duff added as a Flat Fee
   exchange = exchange.toFixed(8);
 
 //-----------------------------------------------------------------Generate dynamic address information
@@ -121,7 +180,8 @@ if (BsRate.error==0){
     callback(address,wif,pAddress);*/
     //CABLE'S END
 
-    //Generation of dynamic address using BlockCypher
+    //Generation of dynamic address using BlockCypher--------------------------------------------------------------------------------------
+    /*
     request.post(
       "https://api.blockcypher.com/v1/dash/main/addrs?token=cc0b3cdc830d431e8405d448c1f9c335",
       { json: { key: 'value' } },
@@ -139,7 +199,41 @@ if (BsRate.error==0){
             console.log("Error on generating address"); //must be HTML
           }
           callback(Address);
+      });*/
+
+    //Generation of dynamic address using DashText API------------------------------------------------------------------------------------------
+    request.post({
+      url: 'https://dash.abacco.com/apinew.php',
+      form: { address:/*eval("process.env."+req.headers.idestablecimiento) <-env variables */merchantsCodes[req.headers.idestablecimiento],
+              token:'ADGPNP1'
+              },
+      headers: { 
+         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.110 Safari/537.36',
+         'Content-Type' : 'application/x-www-form-urlencoded' 
+      },
+      method: 'POST'
+     },
+      function (error, response, body) {
+          if (!error && response.statusCode == 200) {
+            let JSONresponse = JSON.parse(body);
+            console.log(JSONresponse, 'RESPONSE FROM NEW ADDRESS');
+            transferCodeDT =JSONresponse['code'];
+             Address = {
+              address : JSONresponse['address'],
+             /* wif : body.wif,
+              private : body.private,
+              public :body.public,*/
+              error:0}
+          }
+          else{
+            Address = {error:1}
+            console.log("Error on generating address"); //must be HTML
+          }
+          callback(Address);
       });
+
+
+
 };
 
   //-----------------------------------------------------------Validate the generated address
@@ -150,14 +244,16 @@ if (BsRate.error==0){
       var data = {
       validated:true,
       InvoiceID : req.headers.contrato,
-      Private :Address.private,
+      //Private :Address.private,
       Address :  Address.address,
-      Wif:Address.wif,
-      Public: Address.public,
+      //Wif:Address.wif,
+     // Public: Address.public,
       Amount :exchange, 
       AmountBsS : req.headers.monto,
       Date :moment().format('llll')
       }
+
+      console.log(data);
       var addrCheck = addrValidator.validate(data.Address, 'DASH');
       console.log('2.5');
       if(addrCheck)
@@ -216,15 +312,15 @@ if (BsRate.error==0){
     console.log('4');
    data.SimpleAddress=data.Address;
    data.RAddress ="dash:"+data.Address+'?amount='+data.Amount;
-   var PrivateEncrypted = encryptor.encrypt(data.Private);
-   var PublicEncrypted = encryptor.encrypt(data.Public);
+   //var PrivateEncrypted = encryptor.encrypt(data.Private);
+   //var PublicEncrypted = encryptor.encrypt(data.Public);
    var AddressEncrypted = encryptor.encrypt(data.Address);
    var rpq =  encryptor.encrypt(req.headers.idestablecimiento);
    var Mbs =  encryptor.encrypt(req.headers.monto);
    var Cnt =  encryptor.encrypt(req.headers.contrato);
    console.log('5');
-   data.privateAddress = PrivateEncrypted;
-   data.publicAddress = PublicEncrypted;
+   //data.privateAddress = PrivateEncrypted;
+   //data.publicAddress = PublicEncrypted;
    data.Address = AddressEncrypted;
    data.RPQ = rpq;
    data.Mbs = Mbs;
@@ -262,7 +358,8 @@ if (BsRate.error==0){
     res.render('index', {data});
   }
 }
- //------------------------------Start!
+ //------------------------------Start! 
+
  //-----------------------------------Validate if the contract (invoice) is not repeated in the merchant, if repeated return the Tx response.
  pool.query('SELECT * FROM paymentlog WHERE Contrato = '+req.headers.contrato+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
   if (rows == undefined){
@@ -319,7 +416,8 @@ router.post('/timeup', function (req, res) {
     }else{
       var TxData = {
         ID_Establecimiento : Eid,
-        MontoBs: Mbs, 
+        MontoFiat: Mbs, 
+        TipoFiat : 'Bs',
         Contrato: Cnt,
         MontoDash: rows[0].MontoDash,
         Hash: "NA",
@@ -330,7 +428,7 @@ router.post('/timeup', function (req, res) {
       pool.query('INSERT INTO txinfo SET ?', TxData, function (error, results, fields) {
         if (!error){
         console.log('Query executed.');
-        
+
         //------------------Send Tx info to merchant's URL.
         const options = {  
           url: 'http://localhost:3000/testresponse',
@@ -342,11 +440,10 @@ router.post('/timeup', function (req, res) {
       };
         request(options, function(err, output, body) {});
       //---------------------------------------------------
-
         res.send({error : 0,
           message : 'completed'});
-          return;}
-        else{
+          return;
+        }else{
         console.log('Error while performing Query.');
         }
       });
@@ -358,6 +455,146 @@ router.post('/timeup', function (req, res) {
 router.post('/testresponse', function (req, res) {
 console.log(req.body);
 });
+
+
+//---------------------------------------------------------Route to be executed using DashText endpoint to get payment on dynamic address.
+router.post('/actionDashText', function (req, res) {
+  //-------------------------------------Merchants ID
+  var Eid = encryptor.decrypt(req.body.Eid);
+  var Mbs = encryptor.decrypt(req.body.Mbs);
+  var Cnt = encryptor.decrypt(req.body.Cnt);
+  var MayorAddress = merchantsCodes[Eid];
+  let amountFromDT =req.body.AmounToDT;
+  let transferCodeDTAction =transferCodeDT;
+  MayorAddress = (MayorAddress.replace(/['"]+/g, '')).trim();
+    //-------------------------------Callback of creating log
+    function logResponse(res){
+      console.log('antes log');
+      if(res.validated==true){
+        console.log("Log created successfully.");
+      }if(res.validated==false){
+        console.log("Error creating  log.");}
+    };
+    //-------------------------------Function to save the Tx info and update the payments log.
+    function runTx(data,callback) {
+      pool.query('SELECT ID, TextToken FROM paymentlog WHERE Contrato = '+data.Contrato+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
+          data.FK_PaymentId = rows[0].ID;
+          var TextToken = rows[0].TextToken;
+          pool.query('UPDATE paymentlog SET TextTokenStatus = false WHERE  TextToken = '+TextToken+'');   
+          console.log("1er select");
+          pool.query('INSERT INTO txinfo SET ?', data, function (error, results, fields) {
+            console.log("2do select o insert");
+            if (!error){
+            console.log('Query executed.');
+            data.validated = true;
+            }
+            else{
+            console.log(error);
+            console.log('Error while performing Query.');
+            data.validated = false;
+            }
+            callback(data);
+          });
+      });   
+    }
+  var adrdecrypted = encryptor.decrypt(req.body.Address);//'XrNUrhPrUVnL4CXJ3urXitJhwsUizhxqie';//encryptor.decrypt(req.body.Address);
+  var address = req.body.address;
+
+  function makeTxDashText(amountFromDT,transferCodeDTAction) {
+  console.log('just before make transfer using DT');
+  console.log('amount to DT',amountFromDT);
+  console.log('code to DT',transferCodeDT);
+  request.post({
+    url: 'https://dash.abacco.com/api/apitran.php',
+    form: { amount:amountFromDT,
+            code:transferCodeDTAction,
+            token:'ADGPNP1'
+            },
+    headers: { 
+       'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.110 Safari/537.36',
+       'Content-Type' : 'application/x-www-form-urlencoded' 
+    },
+    method: 'POST'
+   },
+    function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        console.log('Tx completed using DashText');
+        let JSONresponse = JSON.parse(response.body);
+        let toAddress = JSONresponse['to'];
+        let txHash = JSONresponse['hash'];
+        let txAmount = JSONresponse['amount'];
+        console.log(toAddress,txHash,txAmount);
+        var TxData = {
+          ID_Establecimiento : Eid,
+          MontoFiat: Mbs,
+          TipoFiat : 'Bs', 
+          Contrato: Cnt,
+          MontoDash: txAmount,
+          Hash: txHash,
+          Status : "Completed",
+          DateCompleted: moment().format('llll')
+        }
+
+        runTx(TxData,logResponse); // Function to save data in the DB.
+        res.render('actionDashText', {
+         Errors : 0,
+         Hash:txHash,
+         DateCompleted:TxData.DateCompleted,
+         ValueDash:txAmount},
+         function(err, html) {
+          res.send({MontoDash: txAmount,
+          Hash: txHash,
+          Contrato: Cnt,
+          Status : "Completed",
+          TimeStamp: TxData.DateCompleted});
+           }
+           );
+      }else{
+        console.log('Error on Dash Text API(TRAN)',error);
+        var TxData = {
+          ID_Establecimiento : Eid,
+          MontoFiat: Mbs,
+          TipoFiat : 'Bs', 
+          Contrato: Cnt,
+          MontoDash: amountFromDT,
+          Hash: "NA",
+          Status : "Failed",
+          Date: moment().format('llll')
+        }
+        //Call to function to save de Tx and log info.  
+        runTx(TxData,logResponse);
+        res.statusCode=500;
+        res.render('actionDashText', {
+          Errors : 1,
+          Hash: "NA",
+          DateCompleted: moment().format('llll'),
+          ValueDash:txAmount},
+         function(err, html) {
+          res.send({MontoDash: amountFromDT,
+          Hash: "NA",
+          Status : "Failed",
+          Contrato: Cnt,
+          TimeStamp:  moment().format('llll') });
+        }
+        );
+      }
+
+    })
+  }
+
+  makeTxDashText(amountFromDT,transferCodeDTAction);
+
+  //Fail
+ /* console.log('antes del render');
+  res.statusCode = 500;
+  res.render('action', {
+    Errors : 1});*/
+
+}),
+    
+
+
+
 //---------------------------------------------------------Route to be executed when the Tx is dicovered in the Blockchain.
 router.post('/action', function (req, res) {
   //-------------------------------------Merchants ID
@@ -505,8 +742,8 @@ router.post('/action', function (req, res) {
                   }
                   //Call to function to save de Tx and log info.  
                   runTx(TxData,logResponse);
-              res.statusCode =500;
-              res.render('action',{
+                res.statusCode =500;
+                res.render('action',{
                 Errors : 1,
                 Hash:Big.Hash,
                 DateCompleted:Big.ActualTime,

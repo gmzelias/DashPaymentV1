@@ -1,6 +1,6 @@
 var request = require('request');
 function checkTx(/*callback*/){
-    if ($('#time').text()=== "00:00" || ms === 300000){ // 60000 ms a minute
+    if ($('#time').text()=== "00:00" || ms === 600000){ // 600000 = 5min
         $('#time').text("00:00");
         clearInterval(refreshIntervalId);
         clearInterval(clocktimer);
@@ -18,7 +18,7 @@ function checkTx(/*callback*/){
             url: "/timeup",
             data: data,
             success: function(a) {        
-                console.log('Success AJAX');
+                console.log('Success AJAX TimeUp');
                 //$('#middle').append(a);
                 $('#RAddress').addClass("hideQR");
                 $('.itemdesc').hide();
@@ -42,7 +42,6 @@ function checkTx(/*callback*/){
                 }, 2000); 
             },
             error: function (e) {
-
             },
         });
         return;
@@ -115,7 +114,10 @@ function checkTx(/*callback*/){
     });
 
 */
-  
+
+
+  /*
+  //Using BlockCypher Endpoints
   console.log('entra en checkTX');
   var address= $('#HexAddr').val();
   console.log(address);
@@ -215,7 +217,109 @@ function checkTx(/*callback*/){
           else{
             alert("Confirmation Error (API)");
           }
-      });
+      });*/
+
+      console.log('entra en checkTX usando DashText');
+      let address= $('#HexAddr').val();
+      request.post({
+        url: 'https://dash.abacco.com/api/apisaldo.php',
+        form: { address:address},
+        headers: { 
+           'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.110 Safari/537.36',
+           'Content-Type' : 'application/x-www-form-urlencoded' 
+        },
+        method: 'POST'
+       },
+          function (error, response, body) {
+              console.log(body);
+              if (!error && response.statusCode == 200) { 
+                let JSONresponse = JSON.parse(body);
+                  if(JSONresponse['amount'] !== 0){                                
+                            //here the blur               
+                            $('#RAddress').addClass("blurmed");
+                            $('#QR').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dashnew.svg" class="ld ld-coin-h" />')      
+                            clearInterval(refreshIntervalId);
+                            clearInterval(clocktimer);
+                            console.log("Payment received");
+                            //var hash = body[i].hash; IMPORTANT
+                            var data = {
+                                hash: "addresstest",
+                                address: address,
+                                //prAddress: $('#pr_a').text(),
+                                //puAddress: $('#pu_a').text(),
+                                Address: $('#add_rr').text(),
+                                Eid: $('#Eid').text(),
+                                Mbs: $('#Mbs').text(),
+                                Cnt: $('#Cnt').text(),
+                                AmounToDT:JSONresponse['amount']
+                            };
+                           // o = addressUN.length;
+                            //i =  body.length;   
+                            mSecondsSuccess = 1;
+                            $.ajax({
+                                type: "POST",
+                                url: "/actionDashText",
+                                data: data,
+                                success: function(a) {        
+                                     //clock.stop();                     
+                            console.log('Success AJAX');
+                            //$('#middle').append(a);
+                            $('#RAddress').addClass("hideQR");
+                            $('.itemdesc').hide();
+                            $('.costBs').hide();
+                            $('.topdiv').hide();
+                            //$('#DashLoader').removeClass("ld");
+                            $('#QR').addClass("actionlogo");
+                            $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashCompleted" class="ld ld-tick" /></div>');
+                            $('#HexButton').remove();
+                            // $('#submit').remove();
+                            $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Success"/></div>');
+                            $('.SubDashText').remove();
+                            $('.dashTextUp').remove();
+                            //$('.dashTextDown').remove();
+                            $('.TextToken').remove();
+                            //$('#dashText').append('<div class ="bigEntrance"><button id="submit"></button>')
+                            //console.log(a);
+                            //$("#timerqr").removeClass("blurmed");
+                            //window.location.href="http://localhost:3000/action";
+                            setTimeout(function () {
+                                $('#DashCompleted').removeClass("ld");
+                                }, 2000); 
+                            },
+                                error: function (e) {
+                                    console.log('Error AJAX',e);
+                                    //$('#middle').append(a);
+                                    $('#RAddress').addClass("hideQR");
+                                    $('.itemdesc').hide();
+                                    $('.costBs').hide();
+                                    $('.topdiv').hide();
+                                    //$('#DashLoader').removeClass("ld");
+                                    $('#QR').addClass("actionlogo");
+                                    $('#QR').prepend('<div class = "topdivchecked bigEntrance"><img id="DashFailed" class="ld ld-tick" /></div>')
+                                    $('#HexButton').remove();
+                                    $('#mainHexButton').prepend('<div class ="bigEntrance"><img id="Fail"/></div>');
+                                    $('.SubDashText').remove();
+                                    $('.dashTextUp').remove();
+                                    //$('.dashTextDown').remove();
+                                    $('.TextToken').remove();
+                                // $('#dashText').append('<div class ="bigEntrance"><button id="submitfail"></button>')
+                                    //console.log(a);
+                                    //$("#timerqr").removeClass("blurmed");
+                                    //window.location.href="http://localhost:3000/action";
+                                    setTimeout(function () {
+                                    $('#DashFailed').removeClass("ld");
+                                    }, 2000); 
+                                },
+                            });
+                        }  
+              }
+              else{
+                alert("Confirmation Error (DashTextAPI)");
+
+              }
+          }
+          
+          );
          
 };
 
