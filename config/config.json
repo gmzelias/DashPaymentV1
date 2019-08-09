@@ -1,6 +1,6 @@
 {
     "test":{
-        "PORT":3000,
+        "PORT":3001,
         "JWT_SECRET":"324325fsdfsfkmwofekpvsd.q30",
         "gmz8": "XkJaPVLUt3J6UYPgaWmuPu7nka7pWhfga3",
         "tulocompras": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q",    
@@ -8,7 +8,7 @@
 
     },
     "development":{
-        "PORT":3000,
+        "PORT":3001,
         "JWT_SECRET":"asdwwqkjri2u3439urjrcp230.dgsrt",
         "gmz8": "XkJaPVLUt3J6UYPgaWmuPu7nka7pWhfga3",
         "tulocompras": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q",                   
@@ -16,7 +16,7 @@
     },
 
     "production":{
-        "PORT":3000,
+        "PORT":3001,
         "JWT_SECRET":"asdwwqkjri2u3439urjrcp230.dgsrt",
         "gmz8": "XkJaPVLUt3J6UYPgaWmuPu7nka7pWhfga3",
         "tulocompras": "XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q",
