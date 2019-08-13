@@ -74,7 +74,9 @@ router.get('/checkTxStatus', function (req, res, next) {
   req.setTimeout(350000);
   let ms = 0;
   let refreshIntervalId = setInterval(rex,7000); 
-  if (req.headers.contrato == undefined){
+  console.log(req.headers.contrato);
+  console.log(req.headers.idestablecimiento);
+  if (req.headers.contrato == undefined || req.headers.idestablecimiento == undefined ){
     console.log('Undefined header')
     clearInterval(refreshIntervalId);
     return res.status(500).send({error:'Missing information'});
@@ -91,8 +93,8 @@ router.get('/checkTxStatus', function (req, res, next) {
       clearInterval(refreshIntervalId);
       return res.status(500).send({error:'Data not found'});
     }else{
-      var SQL = 'SELECT * FROM txinfo WHERE Contrato = ?';
-      pool.query(SQL, [req.headers.contrato], function(err, rows, fields) {
+      var SQL = 'SELECT * FROM txinfo WHERE Contrato = ? AND ID_Establecimiento = ?';
+      pool.query(SQL, [req.headers.contrato,req.headers.idestablecimiento], function(err, rows, fields) {
         if (err){
           console.log('Error on DB')
           clearInterval(refreshIntervalId);
