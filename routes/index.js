@@ -123,8 +123,8 @@ router.get('/', function (req, res, next) {
 //console.log(req.headers); //Show headers on console.
 // ------------------------------------------------------------Validate that headers in the request are valid.
 if (req.headers.idestablecimiento == undefined || req.headers.monto==undefined || req.headers.contrato==undefined || merchantsCodes[req.headers.idestablecimiento]==undefined){
-  var data = {validated:"headers"}// Error with currency
-  res.render('index', {data});
+  var data = {validated:"headers"}// Error with headers
+  res.status(500).render('index', {data});
   return;
 }
 //-----------------
@@ -264,14 +264,12 @@ if (BsRate.error==0){
      {
       console.log('Error with address');
        data.validated = "address";
-       res.render('index', {data});
+       res.status(500).render('index', {data});
       }
     }else{
-      var data = {
-        validated:"address",
-      }
+      var data = {validated:"address"}
       console.log('Error with address');
-      res.render('index', {data});
+      res.status(500).render('index', {data});
     }
 
     };
@@ -328,7 +326,7 @@ if (BsRate.error==0){
    data.Mbs = Mbs;
    data.Cnt = Cnt;
    data.TextToken = data.TextToken;
-   res.render('index', {data});
+   res.status(200).render('index', {data});
   };
 
   getInformation(setInformation);
@@ -357,7 +355,7 @@ if (BsRate.error==0){
     var data = {
       validated:"currency"// Error with currency
     }
-    res.render('index', {data});
+    res.status(500).render('index', {data});
   }
 }
  //------------------------------Start! 
@@ -366,7 +364,7 @@ if (BsRate.error==0){
  pool.query('SELECT * FROM paymentlog WHERE Contrato = '+req.headers.contrato+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
   if (rows == undefined){
     console.log(err);
-    res.send({error : 2,
+    res.status(500).send({error : 2,
       message : 'Error while performing Query'});
       return;
   }
@@ -377,12 +375,12 @@ if (BsRate.error==0){
     var SQL = 'SELECT * FROM txinfo WHERE FK_PaymentId = ? AND ID_Establecimiento = ?';
     pool.query(SQL, [Payment, Merchant], function(err, rows2, fields) {
       if (rows2 == undefined){
-        res.send({error : 2,
+        res.status(500).send({error : 2,
           message : 'Error while performing Query'});
           return;
       }
      if (rows2.length != 0){
-          res.send({
+      res.status(200).send({
           Contrato: rows2[0].Contrato,
           MontoDash: rows2[0].MontoDash,
           Hash: rows2[0].Hash,
@@ -412,7 +410,7 @@ router.post('/timeup', function (req, res) {
   pool.query('SELECT * FROM paymentlog WHERE Contrato = '+Cnt+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
     console.log(rows);
     if (rows == undefined){
-      res.send({error : 2,
+      res.status(500).send({error : 2,
         message : 'Error while performing Query'});
         return;
     }else{
@@ -442,7 +440,7 @@ router.post('/timeup', function (req, res) {
       };
         request(options, function(err, output, body) {});
       //---------------------------------------------------
-        res.send({error : 0,
+      res.status(200).send({error : 0,
           message : 'completed'});
           return;
         }else{
@@ -538,6 +536,7 @@ router.post('/actionDashText', function (req, res) {
         }
 
         runTx(TxData,logResponse); // Function to save data in the DB.
+        res.statusCode=200;
         res.render('actionDashText', {
          Errors : 0,
          Hash:txHash,
@@ -585,349 +584,32 @@ router.post('/actionDashText', function (req, res) {
   }
 
   makeTxDashText(amountFromDT,transferCodeDTAction);
-
-  //Fail
- /* console.log('antes del render');
-  res.statusCode = 500;
-  res.render('action', {
-    Errors : 1});*/
-
 }),
     
-
-
-
-//---------------------------------------------------------Route to be executed when the Tx is dicovered in the Blockchain.
-router.post('/action', function (req, res) {
-  //-------------------------------------Merchants ID
-  var Eid = encryptor.decrypt(req.body.Eid);
-  var Mbs = encryptor.decrypt(req.body.Mbs);
-  var Cnt = encryptor.decrypt(req.body.Cnt);
-  var MayorAddress = eval("process.env."+Eid);
-  MayorAddress = (MayorAddress.replace(/['"]+/g, '')).trim()
-
-  //-------------------------------Callback of creating log
-  function logResponse(res){
-    if(res.validated==true){
-      console.log("Log created successfully.");
-    }if(res.validated==false){
-      console.log("Error creating  log.");}
-  };
-
-    //-------------------------------Function to save the Tx info and update the payments log.
-    function runTx(data,callback) {
-      pool.query('SELECT ID, TextToken FROM paymentlog WHERE Contrato = '+data.Contrato+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
-          data.FK_PaymentId = rows[0].ID;
-          var TextToken = rows[0].TextToken;
-          pool.query('UPDATE paymentlog SET TextTokenStatus = false WHERE  TextToken = '+TextToken+'');   
-          console.log("1er select");
-          pool.query('INSERT INTO txinfo SET ?', data, function (error, results, fields) {
-            console.log("2do select o insert");
-            if (!error){
-            console.log('Query executed.');
-            data.validated = true;
-            }
-            else{
-            console.log(error);
-            console.log('Error while performing Query.');
-            data.validated = false;
-            }
-            callback(data);
-          });
-      });   
-    }
-    /*
-    data.validated = true;
-    callback(data);
-    */
-  var privdecrypted = encryptor.decrypt(req.body.prAddress);//'43592e6549a22d033ba6e4068308a07236da5feb51d9ec1978a986ca17efc2c1';//encryptor.decrypt(req.body.prAddress);
-  var pubdecrypted = encryptor.decrypt(req.body.puAddress);//'0361b6d42b0109751ae19898855b25c07e0f2b9c3f22d5257b58bfc1642d0ea57f';//encryptor.decrypt(req.body.puAddress);
-  var adrdecrypted = encryptor.decrypt(req.body.Address);//'XrNUrhPrUVnL4CXJ3urXitJhwsUizhxqie';//encryptor.decrypt(req.body.Address);
-  var hash = req.body.hash;
-  var address = req.body.address;
-  var confirmation = false;
-
-  //----------------------------------------------Function that checks if the first tx has been done (QR SCANNING).
-
-  function getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation){
-    var total; //= 1000;//+ body.fees; // Attention with the total!!!!!!!!!
-    request.get(
-      "https://api.blockcypher.com/v1/dash/main/txs/"+hash+"?token=cc0b3cdc830d431e8405d448c1f9c335",
-      { json: { key: 'value' } },
-      function (error, response, body) {
-          if (!error && response.statusCode == 200) {
-            
-            if (body.confirmations >= 0) { //No confirmations needed 
-              confirmation = true;
-              console.log('1st transaction -------------------------------------------');
-              console.log(body);
-             for(var i = 0; i < body.outputs.length;i++){  
-                if(body.outputs[i].addresses == adrdecrypted)
-                  total = body.outputs[i].value;    
-              }           
-              console.log('End of 1st transaction -------------------------------------------'); 
-               //-------------------------------Create Tx   
-              function BigTx(Big){
-                testB = Big.Errors;
-                if (testB==false){   
-              //---------------------------------Sign Tx         
-              function bigTxCompleted(BigSigned){
-                SignedBig = BigSigned.Errors;
-                if (SignedBig==false){ 
-                  console.log('Tx completed.');
-                    var TxData = {
-                      ID_Establecimiento : Eid,
-                      MontoBs: Mbs, 
-                      Contrato: Cnt,
-                      MontoDash: BigSigned.Value+BigSigned.ActualFee,
-                      Hash: BigSigned.Hash,
-                      Status : "Completed",
-                      DateCompleted: BigSigned.ActualTime
-                    }
-                 //Call to function to save de Tx and log info.   
-                 runTx(TxData,logResponse);
-                 res.render('action', {
-                  Errors : 0,
-                  Hash:BigSigned.Hash,
-                  DateCompleted:BigSigned.ActualTime,
-                  ValueDash:BigSigned.Value},
-                 function(err, html) {
-                  res.send({MontoDash: BigSigned.Value+BigSigned.ActualFee,
-                  Hash: BigSigned.Hash,
-                  Contrato: Cnt,
-                  Status : "Completed",
-                  TimeStamp: BigSigned.ActualTime });
-                });
-                    }
-                else{
-                  var TxData = {
-                    ID_Establecimiento : Eid,
-                    MontoBs: Mbs, 
-                    Contrato: Cnt,
-                    MontoDash: BigSigned.Value+BigSigned.ActualFee,
-                    Hash: BigSigned.Hash,
-                    Status : "Failed",
-                    Date: BigSigned.ActualTime
-                  }
-                  //Call to function to save de Tx and log info.  
-                  runTx(TxData,logResponse);
-                  res.statusCode =500;
-                  res.render('action', {
-                    Errors : 1,
-                    Hash:BigSigned.Hash,
-                    DateCompleted:BigSigned.ActualTime,
-                    ValueDash:BigSigned.Value},
-                   function(err, html) {
-                    res.send({MontoDash: BigSigned.Value+BigSigned.ActualFee,
-                    Hash: BigSigned.Hash,
-                    Status : "Failed",
-                    Contrato: Cnt,
-                    TimeStamp:  moment().format('llll') });
-                  });
-                  console.log('Error signing tx');
-                    }
-                }
-              //---------------------------------------------------Firmar Big
-               SendTx(Big.tx,Big.toSign,Big.signatures,Big.pubkeys,Big.ForcedValue,Big.ForcedFee,bigTxCompleted);
-                } //if errors found when creating Tx
-                else{
-                  console.log('Error creating transaction');
-                  var TxData = {
-                    ID_Establecimiento : Eid,
-                    MontoBs: Mbs, 
-                    Contrato: Cnt,
-                    MontoDash: Big.ForcedValue+Big.ForcedFee,
-                    Hash: "",
-                    Status : "Failed",
-                    Contrato: Cnt,
-                    Date:moment().format('llll')
-                  }
-                  //Call to function to save de Tx and log info.  
-                  runTx(TxData,logResponse);
-                res.statusCode =500;
-                res.render('action',{
-                Errors : 1,
-                Hash:Big.Hash,
-                DateCompleted:Big.ActualTime,
-                ValueDash:Big.ForcedValue+Big.ForcedFee,
-              });       
-                }
-              }
-                newTx(adrdecrypted,privdecrypted,pubdecrypted,total,MayorAddress,1,BigTx); //XxjS2ApJA2u25tkTmFhvxLfmT7RMRLQK1Q Dash Official Android
-            }
-            else{
-              // Code only needed if its necessary that tx has at least one confirmation
-              /*
-                console.log("No se confirmo");
-                setTimeout(function () {
-                console.log('Entramos en el timeout');
-                confirmation = false;
-                times = times + 10;
-                console.log(times);
-                body.confirmations = 3;
-                //VALIDATE WHEN A MINUTE IS COMPLETED
-                getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation)
-                }, 3000); */
-            }
-          }
-        })
-      };
-      //---------------------------- Function that creates new Tx (the number 1 is the percentage of the Tx, there's no need to alter)
-      function newTx(adrdecrypted,privdecrypted,pubdecrypted,total,output,percent,callback){
-        var ResultObject;
-        var input = adrdecrypted; // <-- where money comes from, generated by blockcypher
-        console.log(output);
-        //var output2 =// the 1%   
-        var fee = 300; // IMPORTANT <-- Forced Fee!
-        console.log('Grand Total: '+ total);
-        var total =  total - fee;
-        var value = Math.round((total * percent));
-        /*var value1 = Math.round(value*0.99);
-        var value2 = Math.round(value * 0.01);*/                 //  REVERSE to make 2 tx
-        var options = {
-          uri: 'https://api.blockcypher.com/v1/dash/main/txs/new?token=cc0b3cdc830d431e8405d448c1f9c335',
-          method: 'POST',
-          json: {
-            confirmations:0,
-            //preference:'low',
-            fees : fee,
-            inputs: [{addresses: [input]}], 
-            outputs: [{addresses: [output], value: value}/*
-          {addresses: [output2],value: value2}*/]        //REVERSE to make 2 tx
-          }
-        };
-       request(options, function (error, response, body) {
-          console.log(body);
-          if (!error && response.statusCode == 201) {
-            var signatures = [];
-            var pubkeys = [];
-            var tx = body.tx;
-            var toSign = body.tosign; 
-            //Signing Process <-- IMPORTANTE
-            var EC = new r.ECDSA({'curve': 'secp256k1'});  
-            for(var i = 0; i < toSign.length;i++){
-
-                //*************************************************
-                //Tx signing using ECDSA
-                function signECDSA(){
-                  var signed = EC.signHex(toSign[i], privdecrypted);
-                  return signed
-                }
-               //**************************************************** 
-              var signed = signECDSA();
-              while(signed.indexOf("022100") != -1){
-                signed = signECDSA();
-              };
-              signatures.push(signed);
-              pubkeys.push(pubdecrypted);//('02e91a29b20b2f7458d74f820c4e55137a1b65ed2763e43aadca50a5daa999ff0a')<--public from the input         
-            }   
-           ResultObject = {
-              Errors : false,
-              tx:tx,
-              toSign:toSign,
-              signatures:signatures,
-              pubkeys:pubkeys,
-              ForcedValue: value,
-              ForcedFee: fee
-            }
-            callback(ResultObject);         
-          }
-        else{
-          console.log('Error creating TX');
-           ResultObject = {
-            Errors : true,
-            tx:tx,
-            toSign:toSign,
-            signatures:signatures,
-            pubkeys:pubkeys,
-            ForcedValue: value,
-            ForcedFee: fee
-          }
-          callback(ResultObject);  
-             }   
-        }); 
-      };
-      //---------------------------------------------------------------------------Function that signs the new Tx
-      function SendTx(tx,toSign,signatures,pubkeys,forcedvalue,forcedfee,callback){
-        var options = {
-          uri: 'https://api.blockcypher.com/v1/dash/main/txs/send?token=cc0b3cdc830d431e8405d448c1f9c335',
-          method: 'POST',
-          json: {
-            tx: tx,
-            tosign: 
-              toSign
-            ,
-            signatures: 
-              signatures
-            ,
-            pubkeys: 
-              pubkeys           
-          }   
-        };
-        console.log('Sending tx...');
-        request(options, function (error, response, body) {  
-          console.log(body);   
-          if (!error && response.statusCode == 201) {
-            ResultObject = {
-              Errors : false,
-              Input:body.tx.addresses[0],
-              Output:body.tx.addresses[1], 
-              ForcedValue:forcedvalue,
-              Value:body.tx.total, 
-              ForcedFee:forcedfee,
-              ActualFee:body.tx.fees,
-              Size:body.tx.size,
-              Hash : body.tx.hash,      
-              ActualTime : moment().format('llll'),
-              Preference:body.tx.preference
-              };
-            callback(ResultObject);
-          }
-            else{
-              ResultObject = {
-                Errors : true,
-                Input:body.tx.addresses[0],
-                Output:body.tx.addresses[1], 
-                ForcedValue:forcedvalue,
-                Value:body.tx.total, 
-                ForcedFee:forcedfee,
-                ActualFee:body.tx.fees,
-                Size:body.tx.size,
-                Hash : body.tx.hash,      
-                ActualTime : moment().format('llll'),
-                Preference:body.tx.preference
-                };
-              callback(ResultObject);
-            }
-        });
-      };
-
-      getConfirmation(hash,adrdecrypted,privdecrypted,pubdecrypted,address,confirmation);
-  });
 
 //---------------------------------------------------------Route that returns the address and ammount of a determined text token to pay with DashText.
 //---------------------------------------------------------Used mainly by DashText app.
 router.get('/TextToken', function (req, res) {
   if (req.headers.token==undefined){
-    res.send({error : 1,
+    res.status(500).send({error : 1,
               message : 'Error with header information'});
     return;
   }
   pool.query('SELECT DynamicAddress,MontoDash, MontoBs FROM paymentlog WHERE TextToken = '+req.headers.token+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
     if (rows == undefined){
-      res.send({error : 2,
+      res.status(500).send({error : 2,
         message : 'Error while performing Query'});
         return;
     }
     if (rows.length == 0)
     {
-      res.send({error : 3,
+      res.status(500).send({error : 3,
         message : 'Token not found'});
         return;
     }
     else
     {
-      res.send({error : 0,
+      res.status(200).send({error : 0,
         message : '',
         DynamicAddress : rows[0].DynamicAddress,
         MontoBsS: rows[0].MontoBs,
