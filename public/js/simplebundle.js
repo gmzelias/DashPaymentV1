@@ -70318,7 +70318,7 @@ WError.prototype.cause = function we_cause(c)
 },{"assert-plus":236,"core-util-is":245,"extsprintf":251,"util":186}],354:[function(require,module,exports){
 var request = require('request');
 function checkTx(/*callback*/){
-    if ($('#time').text()=== "00:00" || ms === 600000){ // 600000 = 5min
+    if ($('#time').text() === "04:51" || ms === 600000){ // 600000 = 5min
         $('#time').text("00:00");
         clearInterval(refreshIntervalId);
         clearInterval(clocktimer);
@@ -70569,6 +70569,7 @@ function checkTx(/*callback*/){
                                 Eid: $('#Eid').text(),
                                 Mbs: $('#Mbs').text(),
                                 Cnt: $('#Cnt').text(),
+                                TcDT: $('#TcDT').text(),
                                 AmounToDT:JSONresponse['amount']
                             };
                            // o = addressUN.length;

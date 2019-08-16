@@ -37,8 +37,9 @@ block content
                             #Eid(hidden='') #{data.RPQ}
                             #Mbs(hidden='') #{data.Mbs}
                             #Cnt(hidden='') #{data.Cnt}
+                            #TcDT(hidden='') #{data.TcDT}
                             p.cost Precio: #{data.Amount} Dash
-                            p.costBs #{data.AmountBsS} BsS
+                            p.costBs #{data.CurrencyAmount} #{data.currency}
                             p.itemdesc #{data.InvoiceID}
                             #QR
                                 #RAddress
