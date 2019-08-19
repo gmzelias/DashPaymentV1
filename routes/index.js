@@ -31,7 +31,6 @@ var pool      =    mysql.createPool({
 //Check tx status, endpoint for integration
 router.get('/checkTxStatus', function (req, res, next) {
   req.on('close', function (err){
-
     clearInterval(refreshIntervalId);
 });
   req.setTimeout(350000);
@@ -100,37 +99,22 @@ if (req.query.idestablecimiento == undefined || req.query.monto==undefined || re
  //------------------------------Start! 
 
  //-----------------------------------Validate if the contract (invoice) is not repeated in the merchant, if repeated return the Tx response.
- pool.query('SELECT * FROM paymentlog WHERE Contrato = '+req.query.contrato+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
+ var SQL = 'SELECT * FROM txinfo, paymentlog WHERE paymentlog.Contrato = ? AND paymentlog.Establecimiento = ? AND txinfo.FK_PaymentId = paymentlog.ID';
+ pool.query(SQL, [req.query.contrato, req.query.idestablecimiento], function(err, rows, fields) {
   if (rows == undefined){
     console.log(err);
     res.status(500).send({error : 2,
       Message : 'Error while performing Query'});
       return;
   }
-  if (rows.length != 0)
-  {
-    var Payment = rows[0].ID;
-    var Merchant = req.query.idestablecimiento;
-    var SQL = 'SELECT * FROM txinfo WHERE FK_PaymentId = ? AND ID_Establecimiento = ?';
-    pool.query(SQL, [Payment, Merchant], function(err, rows2, fields) {
-      if (rows2 == undefined){
-        res.status(500).send({error : 2,
-          Message : 'Error while performing Query'});
-          return;
-      }
-     if (rows2.length != 0){
+  if (rows.length != 0){
       res.status(202).send({
-          Contrato: rows2[0].Contrato,
-          MontoDash: rows2[0].MontoDash,
-          Hash: rows2[0].Hash,
-          Status : rows2[0].Status,
-          TimeStamp: rows2[0].DateCompleted });
+          Contrato: rows[0].Contrato,
+          MontoDash: rows[0].MontoDash,
+          Hash: rows[0].Hash,
+          Status : rows[0].Status,
+          TimeStamp: rows[0].DateCompleted });
           return;
-      }
-      else{
-        getRate(AssignBs);
-      }
-    });
   }else{
     getRate(AssignBs);
   } 
