@@ -37,7 +37,7 @@ router.get('/checkTxStatus', function (req, res, next) {
   req.setTimeout(350000);
   let ms = 0;
   let refreshIntervalId = setInterval(rex,7000); 
-  if (req.headers.contrato == undefined || req.headers.idestablecimiento == undefined ){
+  if (req.query.contrato == undefined || req.query.idestablecimiento == undefined ){
     clearInterval(refreshIntervalId);
     return res.status(500).send({Message:'Missing information'});
   }
@@ -53,7 +53,7 @@ router.get('/checkTxStatus', function (req, res, next) {
       return res.status(500).send({Message:'Data not found'});
     }else{
       var SQL = 'SELECT * FROM txinfo WHERE Contrato = ? AND ID_Establecimiento = ?';
-      pool.query(SQL, [req.headers.contrato,req.headers.idestablecimiento], function(err, rows, fields) {
+      pool.query(SQL, [req.query.contrato,req.query.idestablecimiento], function(err, rows, fields) {
         if (err){
           console.log('Error on DB')
           clearInterval(refreshIntervalId);
@@ -82,15 +82,16 @@ router.get('/', function (req, res, next) {
 let exchange;
 //console.log(req.headers); //Show headers on console.
 // ------------------------------------------------------------Validate that headers in the request are valid.
-if (req.headers.idestablecimiento == undefined || req.headers.monto==undefined || req.headers.contrato==undefined || 
-    req.headers.currency==undefined){
+//req.query.idestablecimiento == undefined 
+if (req.query.idestablecimiento == undefined || req.query.monto==undefined || req.query.contrato==undefined || 
+  req.query.currency==undefined){
   var data = {validated:"headers"}// Error with headers
  // res.status(500).render('index', {data}); //  HTML (VISUAL) VERSION
 
                                                 // INTEGRATION VERSION
   res.status(500).render('index', {data},       // 
   function(err, html) {                         //
-   res.send({Message: 'Check headers data'});     //
+   res.send({Message: 'Check params data'});     //
     }                                           //
   )                                             //
                                                 // INTEGRATION VERSION
@@ -99,7 +100,7 @@ if (req.headers.idestablecimiento == undefined || req.headers.monto==undefined |
  //------------------------------Start! 
 
  //-----------------------------------Validate if the contract (invoice) is not repeated in the merchant, if repeated return the Tx response.
- pool.query('SELECT * FROM paymentlog WHERE Contrato = '+req.headers.contrato+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
+ pool.query('SELECT * FROM paymentlog WHERE Contrato = '+req.query.contrato+' ORDER BY ID DESC LIMIT 1', function(err, rows, fields) {
   if (rows == undefined){
     console.log(err);
     res.status(500).send({error : 2,
@@ -109,7 +110,7 @@ if (req.headers.idestablecimiento == undefined || req.headers.monto==undefined |
   if (rows.length != 0)
   {
     var Payment = rows[0].ID;
-    var Merchant = req.headers.idestablecimiento;
+    var Merchant = req.query.idestablecimiento;
     var SQL = 'SELECT * FROM txinfo WHERE FK_PaymentId = ? AND ID_Establecimiento = ?';
     pool.query(SQL, [Payment, Merchant], function(err, rows2, fields) {
       if (rows2 == undefined){
@@ -118,7 +119,7 @@ if (req.headers.idestablecimiento == undefined || req.headers.monto==undefined |
           return;
       }
      if (rows2.length != 0){
-      res.status(200).send({
+      res.status(500).send({
           Contrato: rows2[0].Contrato,
           MontoDash: rows2[0].MontoDash,
           Hash: rows2[0].Hash,
@@ -142,11 +143,11 @@ if (req.headers.idestablecimiento == undefined || req.headers.monto==undefined |
 function getRate(callback){
 RateInfo = {error:0,rate:0}
 
-if (req.headers.currency != 'Bs' && req.headers.currency != 'USD' ){
+if (req.query.currency != 'Bs' && req.query.currency != 'USD' ){
   RateInfo.error=1;
   callback(RateInfo);
 }
-if (req.headers.currency === 'Bs'){
+if (req.query.currency === 'Bs'){
     /*var options = {uri: 'https://dash.casa/api/?cur=VES',
                     method: 'GET'};*/
 
@@ -166,7 +167,7 @@ if (req.headers.currency === 'Bs'){
       callback(RateInfo);
     });
   }
-  if (req.headers.currency === 'USD'){
+  if (req.query.currency === 'USD'){
     var options = {uri: 'http://ec2-18-237-86-164.us-west-2.compute.amazonaws.com:3000/API/dashRate?currency=USD',
     method: 'GET'};  
     request(options, function (error, response, body) {   
@@ -189,7 +190,7 @@ function AssignBs(RateInfo){
 var finalRate = RateInfo;
 if (finalRate.error==0){
   var rate = finalRate.rate;
-  exchange = ((req.headers.monto) / rate) //+0.00000300; // 300 Duff added as a Flat Fee
+  exchange = ((req.query.monto) / rate) //+0.00000300; // 300 Duff added as a Flat Fee
   exchange = exchange.toFixed(8);
   getInformation(setInformation);
   } //----------------------------------if from currency in BsS
@@ -213,9 +214,9 @@ if (finalRate.error==0){
    //var PrivateEncrypted = encryptor.encrypt(data.Private);
    //var PublicEncrypted = encryptor.encrypt(data.Public);
    var AddressEncrypted = encryptor.encrypt(data.Address);
-   var rpq =  encryptor.encrypt(req.headers.idestablecimiento);
-   var Mbs =  encryptor.encrypt(req.headers.monto);
-   var Cnt =  encryptor.encrypt(req.headers.contrato);
+   var rpq =  encryptor.encrypt(req.query.idestablecimiento);
+   var Mbs =  encryptor.encrypt(req.query.monto);
+   var Cnt =  encryptor.encrypt(req.query.contrato);
    var TcDT =  encryptor.encrypt(data.transferCodeDT);
    console.log('5');
    //data.privateAddress = PrivateEncrypted;
@@ -226,7 +227,7 @@ if (finalRate.error==0){
    data.Cnt = Cnt;
    data.TcDT = TcDT;
    data.TextToken = data.TextToken;
-   data.currency = req.headers.currency
+   data.currency = req.query.currency
    res.status(200).render('index', {data});
   };
 
@@ -244,7 +245,7 @@ if (finalRate.error==0){
         Contrato:data.InvoiceID,
         DynamicAddress:data.Address,
         MontoDash:data.Amount,
-        MontoFiat:req.headers.monto,
+        MontoFiat:req.query.monto,
         TextToken:TextToken.toString(),
         DateCreated:data.Date,
         TextTokenStatus:true,
@@ -272,15 +273,15 @@ if (finalRate.error==0){
     {
      var data = {
      validated:true,
-     InvoiceID : req.headers.contrato,
+     InvoiceID : req.query.contrato,
      //Private :Address.private,
      Address :  Address.address,
      transferCodeDT : Address.transferCodeDT,
      //Wif:Address.wif,
     // Public: Address.public,
-     establecimiento: req.headers.idestablecimiento,
+     establecimiento: req.query.idestablecimiento,
      Amount :exchange, 
-     CurrencyAmount : req.headers.monto,
+     CurrencyAmount : req.query.monto,
      Date :moment().format('llll')
      }
 
@@ -314,10 +315,10 @@ if (finalRate.error==0){
 //-----------------------------------------------------------------Generate dynamic address information
 function getInformation(callback){
   console.log('1');
-  let finalAddress = merchantsCodes[req.headers.idestablecimiento];
+  let finalAddress = merchantsCodes[req.query.idestablecimiento];
   if (finalAddress === undefined){
     var SQL = 'SELECT id,DashAddress FROM User WHERE email = ?';
-    pool.query(SQL, [req.headers.idestablecimiento], function(err, rows, fields) {
+    pool.query(SQL, [req.query.idestablecimiento], function(err, rows, fields) {
       if (err){
         console.log('entra en error al buscar en la BD');
         Address = {error:1} 
@@ -343,8 +344,7 @@ function getInformation(callback){
                   if (!error && response.statusCode == 200) {
                     let JSONresponse = JSON.parse(body);
                     console.log(JSONresponse);
-                    //console.log(JSONresponse, 'RESPONSE FROM NEW ADDRESS');
-                    
+                    console.log(JSONresponse, 'RESPONSE FROM NEW ADDRESS');
                     Address = {
                       address : JSONresponse['address'],
                       transferCodeDT : JSONresponse['code'],
