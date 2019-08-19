@@ -119,7 +119,7 @@ if (req.query.idestablecimiento == undefined || req.query.monto==undefined || re
           return;
       }
      if (rows2.length != 0){
-      res.status(500).send({
+      res.status(202).send({
           Contrato: rows2[0].Contrato,
           MontoDash: rows2[0].MontoDash,
           Hash: rows2[0].Hash,
