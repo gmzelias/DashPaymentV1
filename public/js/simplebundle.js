@@ -70336,7 +70336,7 @@ function checkTx(/*callback*/){
             url: "/timeup",
             data: data,
             success: function(a) {        
-                console.log('Success AJAX TimeUp');
+               // console.log('Success AJAX TimeUp');
                 //$('#middle').append(a);
                 $('#RAddress').addClass("hideQR");
                 $('.itemdesc').hide();
@@ -70537,7 +70537,6 @@ function checkTx(/*callback*/){
           }
       });*/
 
-      console.log('entra en checkTX usando DashText');
       let address= $('#HexAddr').val();
       request.post({
         url: 'https://dash.abacco.com/api/apisaldo.php',
@@ -70549,7 +70548,7 @@ function checkTx(/*callback*/){
         method: 'POST'
        },
           function (error, response, body) {
-              console.log(body);
+             // console.log(body);
               if (!error && response.statusCode == 200) { 
                 let JSONresponse = JSON.parse(body);
                   if(JSONresponse['amount'] !== 0){                                
@@ -70558,7 +70557,7 @@ function checkTx(/*callback*/){
                             $('#QR').prepend('<div class = "topdiv"><img id="DashLoader" style="width:100px;height:100px;" src="img/dashnew.svg" class="ld ld-coin-h" />')      
                             clearInterval(refreshIntervalId);
                             clearInterval(clocktimer);
-                            console.log("Payment received");
+                           // console.log("Payment received");
                             //var hash = body[i].hash; IMPORTANT
                             var data = {
                                 hash: "addresstest",
@@ -70581,7 +70580,7 @@ function checkTx(/*callback*/){
                                 data: data,
                                 success: function(a) {        
                                      //clock.stop();                     
-                            console.log('Success AJAX');
+                           // console.log('Success AJAX');
                             //$('#middle').append(a);
                             $('#RAddress').addClass("hideQR");
                             $('.itemdesc').hide();
@@ -70606,7 +70605,7 @@ function checkTx(/*callback*/){
                                 }, 2000); 
                             },
                                 error: function (e) {
-                                    console.log('Error AJAX',e);
+                                 //   console.log('Error AJAX',e);
                                     //$('#middle').append(a);
                                     $('#RAddress').addClass("hideQR");
                                     $('.itemdesc').hide();

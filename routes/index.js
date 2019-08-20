@@ -47,14 +47,14 @@ router.get('/checkTxStatus', function (req, res, next) {
     function rex(){
     ms = ms + 10000;
     if (ms === 450000){ 
-      console.log('Data not found')
+      //console.log('Data not found')
       clearInterval(refreshIntervalId);
       return res.status(500).send({Message:'Data not found'});
     }else{
       var SQL = 'SELECT * FROM txinfo WHERE Contrato = ? AND ID_Establecimiento = ?';
       pool.query(SQL, [req.query.contrato,req.query.idestablecimiento], function(err, rows, fields) {
         if (err){
-          console.log('Error on DB')
+          //console.log('Error on DB')
           clearInterval(refreshIntervalId);
           return res.status(500).send({Message:'Unexpected error (DB)'});            
         }
@@ -67,7 +67,7 @@ router.get('/checkTxStatus', function (req, res, next) {
             Status: rows[0].Status,
             TimeStamp: rows[0].DateCompleted,
           }
-          console.log('Success')
+          //console.log('Success')
           clearInterval(refreshIntervalId);
           return res.status(200).json(dataToSend);      
         }
@@ -102,7 +102,7 @@ if (req.query.idestablecimiento == undefined || req.query.monto==undefined || re
  var SQL = 'SELECT * FROM txinfo, paymentlog WHERE paymentlog.Contrato = ? AND paymentlog.Establecimiento = ? AND txinfo.FK_PaymentId = paymentlog.ID';
  pool.query(SQL, [req.query.contrato, req.query.idestablecimiento], function(err, rows, fields) {
   if (rows == undefined){
-    console.log(err);
+    //console.log(err);
     res.status(500).send({error : 2,
       Message : 'Error while performing Query'});
       return;
@@ -179,7 +179,7 @@ if (finalRate.error==0){
   getInformation(setInformation);
   } //----------------------------------if from currency in BsS
   else{
-    console.log('Error with currency');
+    //console.log('Error with currency');
     var data = {
       validated:"currency"// Error with currency
     }
@@ -236,13 +236,13 @@ if (finalRate.error==0){
         Establecimiento: data.establecimiento}
         pool.query('INSERT INTO paymentlog SET ?', DataToInsert, function (error, results, fields) {
           if (!error){
-          console.log('Query executed.');
+          //console.log('Query executed.');
           data.validated = true;
           callback(data);
           }
           else{
-          console.log(error);
-          console.log('Error while performing Query.');
+          //console.log(error);
+         // console.log('Error while performing Query.');
           data.validated = "query";
           callback(data);
           }
@@ -269,14 +269,14 @@ if (finalRate.error==0){
      Date :moment().format('llll')
      }
 
-     console.log(data);
+     //console.log(data);
      var addrCheck = addrValidator.validate(data.Address, 'DASH');
      console.log('2.5');
      if(addrCheck)
        runQuery(data,setValue)
     else
     {
-     console.log('Error with address');
+    // console.log('Error with address');
       data.validated = "address";
       res.status(500).render('index', {data},
       function(err, html) {
@@ -286,7 +286,7 @@ if (finalRate.error==0){
      }
    }else{
      var data = {validated:"address"}
-     console.log('Error with address');
+    // console.log('Error with address');
      res.status(500).render('index', {data},
      function(err, html) {
       res.send({Message: 'Error with address'});
@@ -304,13 +304,13 @@ function getInformation(callback){
     var SQL = 'SELECT id,DashAddress FROM User WHERE email = ?';
     pool.query(SQL, [req.query.idestablecimiento], function(err, rows, fields) {
       if (err){
-        console.log('entra en error al buscar en la BD');
+        //console.log('entra en error al buscar en la BD');
         Address = {error:1} 
         callback(Address);         
       }
       if (rows.length != 0)
       {
-        console.log(rows[0].DashAddress);
+        //console.log(rows[0].DashAddress);
         finalAddress = rows[0].DashAddress; 
           //Generation of dynamic address using DashText API------------------------------------------------------------------------------------------
             request.post({
@@ -327,8 +327,8 @@ function getInformation(callback){
               function (error, response, body) {
                   if (!error && response.statusCode == 200) {
                     let JSONresponse = JSON.parse(body);
-                    console.log(JSONresponse);
-                    console.log(JSONresponse, 'RESPONSE FROM NEW ADDRESS');
+                    //console.log(JSONresponse);
+                   // console.log(JSONresponse, 'RESPONSE FROM NEW ADDRESS');
                     Address = {
                       address : JSONresponse['address'],
                       transferCodeDT : JSONresponse['code'],
@@ -339,7 +339,7 @@ function getInformation(callback){
                   }
                   else{
                     Address = {error:1}
-                    console.log("Error on generating address"); //must be HTML
+                   // console.log("Error on generating address"); //must be HTML
                   }
                   callback(Address);
               });
@@ -376,7 +376,7 @@ function getInformation(callback){
             }
             else{
               Address = {error:1}
-              console.log("Error on generating address"); //must be HTML
+             // console.log("Error on generating address"); //must be HTML
             }
             callback(Address);
     });
@@ -419,12 +419,12 @@ router.post('/timeup', function (req, res) {
           }
           pool.query('INSERT INTO txinfo SET ?', TxData, function (error, results, fields) {
             if (!error){
-            console.log('Query executed.');
+            //console.log('Query executed.');
             res.status(200).send({error : 0,
               Message : 'completed'});
               return;
             }else{
-            console.log('Error while performing Query');
+            //console.log('Error while performing Query');
             res.status(500).send({error : 1,
               Message : 'Error while performing Query'});
               return;
@@ -446,12 +446,12 @@ router.post('/timeup', function (req, res) {
           }
           pool.query('INSERT INTO txinfo SET ?', TxData, function (error, results, fields) {
             if (!error){
-            console.log('Query executed.');
+            //console.log('Query executed.');
             res.status(200).send({error : 0,
               Message : 'completed'});
               return;
             }else{
-            console.log('Error while performing Query');
+            //console.log('Error while performing Query');
             res.status(500).send({error : 1,
               Message : 'Error while performing Query'});
               return;
@@ -480,11 +480,12 @@ router.post('/actionDashText', function (req, res) {
   //MayorAddress = (MayorAddress.replace(/['"]+/g, '')).trim();
     //-------------------------------Callback of creating log
     function logResponse(res){
-      console.log('antes log');
+      //console.log('antes log');
       if(res.validated==true){
-        console.log("Log created successfully.");
+       // console.log("Log created successfully.");
       }if(res.validated==false){
-        console.log("Error creating  log.");}
+       // console.log("Error creating  log.");
+      }
     };
     //-------------------------------Function to save the Tx info and update the payments log.
     function runTx(data,callback) {
@@ -496,16 +497,16 @@ router.post('/actionDashText', function (req, res) {
           pool.query(SQL, [data.ID_Establecimiento], function(err, rows2, fields) {
             if (rows2.length === 0){
               pool.query('UPDATE paymentlog SET TextTokenStatus = false WHERE  TextToken = '+TextToken+'');   
-              console.log("1er select");
+             // console.log("1er select");
               pool.query('INSERT INTO txinfo SET ?', data, function (error, results, fields) {
-                console.log("2do select o insert");
+              //  console.log("2do select o insert");
                 if (!error){
-                console.log('Query executed.');
+               // console.log('Query executed.');
                 data.validated = true;
                 }
                 else{
-                console.log(error);
-                console.log('Error while performing Query.');
+              //  console.log(error);
+               // console.log('Error while performing Query.');
                 data.validated = false;
                 }
                 callback(data);
@@ -514,16 +515,16 @@ router.post('/actionDashText', function (req, res) {
             else{
               data.FK_UserId = rows2[0].ID;
               pool.query('UPDATE paymentlog SET TextTokenStatus = false WHERE  TextToken = '+TextToken+'');   
-              console.log("1er select");
+            //  console.log("1er select");
               pool.query('INSERT INTO txinfo SET ?', data, function (error, results, fields) {
-                console.log("2do select o insert");
+              //  console.log("2do select o insert");
                 if (!error){
-                console.log('Query executed.');
+              //  console.log('Query executed.');
                 data.validated = true;
                 }
                 else{
-                console.log(error);
-                console.log('Error while performing Query.');
+             //   console.log(error);
+              //  console.log('Error while performing Query.');
                 data.validated = false;
                 }
                 callback(data);
@@ -536,7 +537,7 @@ router.post('/actionDashText', function (req, res) {
     }
 
   function makeTxDashText(amountFromDT,transferCodeDTAction) {
-    console.log(transferCodeDTAction, 'codetoaction');
+  //  console.log(transferCodeDTAction, 'codetoaction');
   request.post({
     url: 'https://dash.abacco.com/api/apitran.php',
     form: { amount:amountFromDT,
@@ -551,14 +552,14 @@ router.post('/actionDashText', function (req, res) {
    },
     function (error, response, body) {
       if (!error && response.statusCode == 200) {
-        console.log('Tx completed using DashText');
+      //  console.log('Tx completed using DashText');
         let JSONresponse = JSON.parse(response.body);
         let toAddress = JSONresponse['to'];
         let txHash = JSONresponse['hash'];
         let txAmount = JSONresponse['amount'];
           // DashText API returns 200 status but there's an error, that why there's this if condition
         if (toAddress === undefined || txHash === undefined ||txAmount === undefined  ){
-          console.log('Error on Dash Text API(TRAN)',error);
+        //  console.log('Error on Dash Text API(TRAN)',error);
           var TxData = {
             ID_Establecimiento : Eid,
             MontoFiat: Mbs,
@@ -616,7 +617,7 @@ router.post('/actionDashText', function (req, res) {
            );
         }
       }else{
-        console.log('Error on Dash Text API(TRAN)',error);
+     //   console.log('Error on Dash Text API(TRAN)',error);
         var TxData = {
           ID_Establecimiento : Eid,
           MontoFiat: Mbs,
