@@ -314,8 +314,7 @@ function checkTx(/*callback*/){
                         }  
               }
               else{
-                alert("Confirmation Error (DashTextAPI)");
-
+                console.log("Confirmation Error (DashTextAPI)");
               }
           }
           
