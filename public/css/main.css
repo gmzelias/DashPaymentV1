@@ -7,15 +7,15 @@
     border-radius: 20px; 
 }
 #mainmiddle {
-    margin-top:30px;
+    margin-top:20px;
     position: inherit;
     padding-bottom: 10px;
 }
 div.imagelogo {
     content:url('/img/DasherLogo.png');
-    width: 300px;
+    width: 360px;
     height: 80px;
-    margin-top: 10px;
+    margin-top: 13px;
     margin-left: 10px;
  }​
 
@@ -292,6 +292,10 @@ p.customfont {
     -webkit-border-radius: 25px;
     -moz-border-radius: 25px;
     border-radius: 25px; 
+}
+
+.modal-open{
+border-top-width: 0px;
 }
 .modal-body{
     padding: 0px;
