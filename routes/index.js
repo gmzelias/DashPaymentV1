@@ -30,13 +30,6 @@ var pool      =    mysql.createPool({
 
 //Check tx status, endpoint for integration
 router.get('/checkTxStatus', function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-  res.setHeader('Access-Control-Allow-Headers', '*');
-
-  res.setHeader('Access-Control-Allow-Credentials', true);
   req.on('close', function (err){
     clearInterval(refreshIntervalId);
 });
@@ -85,13 +78,6 @@ router.get('/checkTxStatus', function (req, res, next) {
 
 //Main Page
 router.get('/', function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-  res.setHeader('Access-Control-Allow-Headers', '*');
-
-  res.setHeader('Access-Control-Allow-Credentials', true);
 let exchange;
 //console.log(req.headers); //Show headers on console.
 // ------------------------------------------------------------Validate that headers in the request are valid.
