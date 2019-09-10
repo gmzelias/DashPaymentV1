@@ -30,8 +30,6 @@ var pool      =    mysql.createPool({
 
 //Check tx status, endpoint for integration
 router.get('/checkTxStatus', function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); 
   req.on('close', function (err){
     clearInterval(refreshIntervalId);
 });
@@ -80,8 +78,6 @@ router.get('/checkTxStatus', function (req, res, next) {
 
 //Main Page
 router.get('/', function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); 
 let exchange;
 //console.log(req.headers); //Show headers on console.
 // ------------------------------------------------------------Validate that headers in the request are valid.
